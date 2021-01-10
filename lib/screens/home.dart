@@ -42,7 +42,14 @@ class _HomeState extends State<Home> {
         ],
       ),
 
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: (){},
+        label: CustomText(text: tr('loyaltyCard'),color: Colors.white,size: ScreenUtil().setSp(35),),
+      ),
+
       body: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -90,6 +97,7 @@ class _HomeState extends State<Home> {
             ),
             SizedBox(height: ScreenUtil().setWidth(40),),
 
+
             ///latest products
             Padding(
               padding: EdgeInsets.all(ScreenUtil().setWidth(20)),
@@ -116,12 +124,12 @@ class _HomeState extends State<Home> {
                           ),
                           child: Padding(
                             padding: EdgeInsets.all(ScreenUtil().setSp(15)),
-                            child: CustomText(text: 'Latest Products',size: ScreenUtil().setSp(30),font: 'ubuntu',),
+                            child: CustomText(text: tr('latestProducts'),size: ScreenUtil().setSp(30),font: 'ubuntu',),
                           ),
                         ),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(25)),
-                          child: CustomText(text: 'See more',isBold: false,color: Theme.of(context).accentColor,),
+                          child: CustomText(text: tr('seeMore'),isBold: false,color: Theme.of(context).accentColor,),
                         )
                       ],
                     ),
@@ -132,6 +140,7 @@ class _HomeState extends State<Home> {
                         options: CarouselOptions(
                           viewportFraction: 0.5,
                           enableInfiniteScroll: false,
+                          aspectRatio: 13/9
                         ),
                         items: [
                           SizedBox(
@@ -224,12 +233,12 @@ class _HomeState extends State<Home> {
                         ),
                         child: Padding(
                           padding: EdgeInsets.all(ScreenUtil().setSp(15)),
-                          child: CustomText(text: 'Coupons',size: ScreenUtil().setSp(30),font: 'ubuntu',),
+                          child: CustomText(text: tr('coupons'),size: ScreenUtil().setSp(30),font: 'ubuntu',),
                         ),
                       ),
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(25)),
-                        child: CustomText(text: 'See more',isBold: false,color: Theme.of(context).accentColor,),
+                        child: CustomText(text: tr('seeMore'),isBold: false,color: Theme.of(context).accentColor,),
                       )
                     ],
                   ),
@@ -277,7 +286,7 @@ class _HomeState extends State<Home> {
                                                           mainAxisAlignment: MainAxisAlignment.center,
                                                           children: [
                                                             CustomText(text: '20%',size: ScreenUtil().setSp(45),font: 'josefin',),
-                                                            CustomText(text: 'Discount',size: ScreenUtil().setSp(25),font: 'josefin',),
+                                                            CustomText(text: tr('discount'),size: ScreenUtil().setSp(25),font: 'josefin',),
                                                           ],
                                                         ),
                                                       ))
@@ -302,7 +311,7 @@ class _HomeState extends State<Home> {
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(5)
                                           ),
-                                          child: CustomText(text: 'Activate',color: Colors.white,),
+                                          child: CustomText(text: tr('activate'),color: Colors.white,),
                                         ),
                                       ),
                                     ],
@@ -348,12 +357,12 @@ class _HomeState extends State<Home> {
                           ),
                           child: Padding(
                             padding: EdgeInsets.all(ScreenUtil().setSp(15)),
-                            child: CustomText(text: 'Discounts',size: ScreenUtil().setSp(30),font: 'ubuntu',),
+                            child: CustomText(text: tr('discounts'),size: ScreenUtil().setSp(30),font: 'ubuntu',),
                           ),
                         ),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(25)),
-                          child: CustomText(text: 'See more',isBold: false,color: Theme.of(context).accentColor,),
+                          child: CustomText(text: tr('seeMore'),isBold: false,color: Theme.of(context).accentColor,),
                         )
                       ],
                     ),
@@ -364,7 +373,8 @@ class _HomeState extends State<Home> {
                         options: CarouselOptions(
                           viewportFraction: 0.5,
                           enableInfiniteScroll: true,
-                          height: ScreenUtil().setHeight(400)
+                          aspectRatio: 13/9
+                          // height: ScreenUtil().setHeight(400)
                         ),
                         items: [
                           SizedBox(
@@ -403,7 +413,7 @@ class _HomeState extends State<Home> {
                                                               mainAxisAlignment: MainAxisAlignment.center,
                                                               children: [
                                                                 CustomText(text: '99%',size: ScreenUtil().setSp(38),font: 'josefin',color: Colors.white,),
-                                                                CustomText(text: 'Discount',size: ScreenUtil().setSp(20),font: 'josefin',color: Colors.white,),
+                                                                CustomText(text: tr('discount'),size: ScreenUtil().setSp(20),font: 'josefin',color: Colors.white,),
                                                               ],
                                                             ),
                                                           ))
@@ -455,7 +465,72 @@ class _HomeState extends State<Home> {
 
 
             ///digitalPDFNewsletter
-
+            Padding(
+              padding: EdgeInsets.all(ScreenUtil().setWidth(20)),
+              child: Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)
+                ),
+                color: Theme.of(context).primaryColor,
+                elevation: 8,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(10),
+                                  bottomRight: Radius.circular(10)
+                              ),
+                              border: Border.all(color: Theme.of(context).accentColor,width: 2)
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.all(ScreenUtil().setSp(15)),
+                            child: CustomText(text: tr('digitalPDFNewsletter'),size: ScreenUtil().setSp(30),font: 'ubuntu',),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(25)),
+                          child: CustomText(text: tr('seeMore'),isBold: false,color: Theme.of(context).accentColor,),
+                        )
+                      ],
+                    ),
+                    SizedBox(height: ScreenUtil().setHeight(30),),
+                    Padding(
+                      padding: EdgeInsets.all(ScreenUtil().setHeight(30)),
+                      child: CarouselSlider(
+                        options: CarouselOptions(
+                          viewportFraction: 0.5,
+                          enableInfiniteScroll: true,
+                          // height: ScreenUtil().setWidth(400),
+                        ),
+                        items: [
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(10)),
+                            child: SizedBox(
+                              width: ScreenUtil().setWidth(400),
+                              child: Card(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.zero,
+                                ),
+                                elevation: 5,
+                                color: Colors.white,
+                                child: Image.network("https://venngage-wordpress.s3.amazonaws.com/uploads/2020/06/Real-Estate-Marketing-Tips-Email-Newsletter-Template.png",fit: BoxFit.fill,),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: ScreenUtil().setWidth(120),),
 
           ],
         ),
