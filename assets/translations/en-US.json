@@ -11,5 +11,12 @@
   "discounts": "Discounts",
   "discount": "Discount",
   "digitalPDFNewsletter": "Digital PDF Newsletter",
-  "loyaltyCard": "Loyalty Card"
+  "loyaltyCard": "Loyalty Card",
+  "logIntoAccount": "Log into your account",
+  "email": "Email",
+  "password": "Password",
+  "forgot": "Forgot?",
+  "logIn": "Log In",
+  "languages": "Languages",
+  "dontHaveAccount": "Don't have an account? Sign Up"
 }

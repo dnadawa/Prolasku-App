@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:prolasku/widgets/button.dart';
 import 'package:prolasku/widgets/custom-text.dart';
 import 'package:prolasku/widgets/marquee.dart';
 
@@ -305,13 +306,11 @@ class _HomeState extends State<Home> {
                                       CustomText(text: 'Rice Bags',font: 'josefin',),
                                       SizedBox(
                                         height: ScreenUtil().setHeight(50),
-                                        child: RaisedButton(
+                                        child: Button(
+                                          text: tr('activate'),
+                                          borderRadius: 5,
+                                          fontSize: 25,
                                           onPressed: (){},
-                                          color: Theme.of(context).accentColor,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(5)
-                                          ),
-                                          child: CustomText(text: tr('activate'),color: Colors.white,),
                                         ),
                                       ),
                                     ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:prolasku/screens/login.dart';
 import 'package:prolasku/screens/tab-page.dart';
 
 void main() {
@@ -31,7 +32,7 @@ class MyApp extends StatelessWidget {
             scaffoldBackgroundColor: Colors.white,
             fontFamily: 'Google Sans'
           ),
-          home: TabPage()
+          home: Login()
       ),
     );
   }
