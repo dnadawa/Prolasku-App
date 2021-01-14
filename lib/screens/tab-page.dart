@@ -16,7 +16,6 @@ class _TabPageState extends State<TabPage> with SingleTickerProviderStateMixin{
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _controller = TabController(length: 5, vsync: this);
     _index = 0;
@@ -24,7 +23,6 @@ class _TabPageState extends State<TabPage> with SingleTickerProviderStateMixin{
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _controller.dispose();
   }

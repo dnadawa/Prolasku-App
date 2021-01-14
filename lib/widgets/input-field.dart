@@ -9,8 +9,9 @@ class InputField extends StatelessWidget {
   final bool isPassword;
   final TextEditingController controller;
   final Widget suffix;
+  final Widget prefix;
 
-  const InputField({Key key, this.hint, this.type, this.isPassword=false, this.controller, this.suffix}) : super(key: key);
+  const InputField({Key key, this.hint, this.type, this.isPassword=false, this.controller, this.suffix, this.prefix}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +26,7 @@ class InputField extends StatelessWidget {
       decoration: InputDecoration(
         suffix: suffix,
         labelText: hint,
+        prefix: prefix,
         labelStyle: GoogleFonts.ubuntu(
           color: Colors.black,
           fontWeight: FontWeight.bold

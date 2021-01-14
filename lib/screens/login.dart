@@ -1,6 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:prolasku/screens/register.dart';
 import 'package:prolasku/widgets/button.dart';
 import 'package:prolasku/widgets/custom-text.dart';
 import 'package:prolasku/widgets/input-field.dart';
@@ -176,8 +178,16 @@ class _LoginState extends State<Login> {
                 SizedBox(height: ScreenUtil().setHeight(80),),
                 Align(
                   alignment: Alignment.bottomLeft,
-                  child: CustomText(
-                    text: tr('dontHaveAccount'),
+                  child: GestureDetector(
+                    onTap: (){
+                      Navigator.push(
+                          context,
+                          CupertinoPageRoute(builder: (context) => Register())
+                      );
+                    },
+                    child: CustomText(
+                      text: tr('dontHaveAccount'),
+                    ),
                   ),
                 )
 

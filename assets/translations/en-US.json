@@ -18,5 +18,11 @@
   "forgot": "Forgot?",
   "logIn": "Log In",
   "languages": "Languages",
-  "dontHaveAccount": "Don't have an account? Sign Up"
+  "dontHaveAccount": "Don't have an account? Sign Up",
+  "createAccount": "Create a new account",
+  "uploadProfilePicture": "Upload a profile picture",
+  "fullName": "Full Name",
+  "phoneNo": "Phone Number",
+  "signUp": "Sign Up",
+  "alreadyHaveAccount": "Already have an account? Login"
 }
