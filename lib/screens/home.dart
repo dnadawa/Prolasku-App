@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:prolasku/widgets/button.dart';
+import 'package:prolasku/widgets/coupon-card.dart';
 import 'package:prolasku/widgets/custom-text.dart';
 import 'package:prolasku/widgets/marquee.dart';
 
@@ -255,69 +256,10 @@ class _HomeState extends State<Home> {
                       items: [
                         SizedBox(
                           //width: ScreenUtil().setWidth(650),
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                                side: BorderSide(color: Theme.of(context).accentColor,width: 3)
-                            ),
-                            elevation: 5,
-                            color: Colors.white,
-                            child: Column(
-                              children: [
-                                Expanded(
-                                    child: Stack(
-                                      children: [
-                                        Padding(
-                                          padding: EdgeInsets.all(ScreenUtil().setWidth(15)),
-                                          child: Center(child: Image.network("https://e7.pngegg.com/pngimages/546/822/png-clipart-biscuit-wafer-weight-petit-beurre-biscuit-wafer-biscuits-thumbnail.png")),
-                                        ),
-                                        Align(
-                                          alignment: Alignment.bottomRight,
-                                          child: Container(
-                                              height: ScreenUtil().setHeight(150),
-                                              width: ScreenUtil().setHeight(150),
-                                              child: Stack(
-                                                children: [
-                                                  Image.asset('assets/images/coupon.png'),
-                                                  Align(
-                                                      alignment: Alignment.centerLeft,
-                                                      child: Padding(
-                                                        padding: EdgeInsets.only(left: ScreenUtil().setHeight(10)),
-                                                        child: Column(
-                                                          mainAxisAlignment: MainAxisAlignment.center,
-                                                          children: [
-                                                            CustomText(text: '20%',size: ScreenUtil().setSp(45),font: 'josefin',),
-                                                            CustomText(text: tr('discount'),size: ScreenUtil().setSp(25),font: 'josefin',),
-                                                          ],
-                                                        ),
-                                                      ))
-                                                ],
-                                              )
-                                          ),
-                                        )
-                                      ],
-                                    )
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.all(ScreenUtil().setWidth(25)),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      CustomText(text: 'Rice Bags',font: 'josefin',),
-                                      SizedBox(
-                                        height: ScreenUtil().setHeight(50),
-                                        child: Button(
-                                          text: tr('activate'),
-                                          borderRadius: 5,
-                                          fontSize: 25,
-                                          onPressed: (){},
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
+                          child: CouponCard(
+                            image: "https://e7.pngegg.com/pngimages/546/822/png-clipart-biscuit-wafer-weight-petit-beurre-biscuit-wafer-biscuits-thumbnail.png",
+                            name: 'Biscuit Packet',
+                            discount: 20,
                           ),
                         ),
 

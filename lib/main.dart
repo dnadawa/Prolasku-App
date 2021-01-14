@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
             scaffoldBackgroundColor: Colors.white,
             fontFamily: 'Google Sans'
           ),
-          home: Login()
+          home: TabPage()
       ),
     );
   }
