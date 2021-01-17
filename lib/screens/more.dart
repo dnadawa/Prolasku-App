@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/screenutil.dart';
+import 'package:prolasku/screens/more/change-language.dart';
 import 'package:prolasku/screens/more/newsletter.dart';
 import 'package:prolasku/screens/more/shop-locations.dart';
 import 'package:prolasku/widgets/custom-text.dart';
@@ -74,7 +75,12 @@ class More extends StatelessWidget {
             leading: Icon(CupertinoIcons.flag_circle,color: Theme.of(context).accentColor,),
             title: CustomText(text: tr('languageChange'),isBold: false,align: TextAlign.start,),
             trailing: Icon(Icons.chevron_right,color: Colors.black,),
-            onTap: (){},
+            onTap: (){
+              Navigator.push(
+                  context,
+                  CupertinoPageRoute(builder: (context) => ChangeLanguage())
+              );
+            },
           ),
           Divider(height: 0,),
 
