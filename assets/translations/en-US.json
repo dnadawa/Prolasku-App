@@ -24,5 +24,12 @@
   "fullName": "Full Name",
   "phoneNo": "Phone Number",
   "signUp": "Sign Up",
-  "alreadyHaveAccount": "Already have an account? Login"
+  "alreadyHaveAccount": "Already have an account? Login",
+  "shopLocations": "Shop Locations",
+  "yourProfile": "Your Profile",
+  "languageChange": "Language Change",
+  "appGuide": "App Guide",
+  "moreInfo": "More Info",
+  "privacyPolicy": "Privacy Policy",
+  "dataProtectionPolicy": "Data Protection Policy"
 }
