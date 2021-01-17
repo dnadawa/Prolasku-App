@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:prolasku/screens/more/newsletter.dart';
 import 'package:prolasku/widgets/button.dart';
 import 'package:prolasku/widgets/coupon-card.dart';
 import 'package:prolasku/widgets/custom-text.dart';
@@ -436,7 +437,14 @@ class _HomeState extends State<Home> {
                         ),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(25)),
-                          child: CustomText(text: tr('seeMore'),isBold: false,color: Theme.of(context).accentColor,),
+                          child: GestureDetector(
+                              onTap: (){
+                                Navigator.push(
+                                    context,
+                                    CupertinoPageRoute(builder: (context) => DigitalPDFNewsletter())
+                                );
+                              },
+                              child: CustomText(text: tr('seeMore'),isBold: false,color: Theme.of(context).accentColor,)),
                         )
                       ],
                     ),
