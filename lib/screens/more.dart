@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/screenutil.dart';
 import 'package:prolasku/screens/more/change-language.dart';
 import 'package:prolasku/screens/more/newsletter.dart';
 import 'package:prolasku/screens/more/policy.dart';
+import 'package:prolasku/screens/more/profile.dart';
 import 'package:prolasku/screens/more/shop-locations.dart';
 import 'package:prolasku/widgets/custom-text.dart';
 
@@ -66,7 +67,12 @@ class More extends StatelessWidget {
             leading: Icon(Icons.account_circle,color: Theme.of(context).accentColor),
             title: CustomText(text: tr('yourProfile'),isBold: false,align: TextAlign.start,),
             trailing: Icon(Icons.chevron_right,color: Colors.black,),
-            onTap: (){},
+            onTap: (){
+              Navigator.push(
+                  context,
+                  CupertinoPageRoute(builder: (context) => Profile())
+              );
+            },
           ),
           Divider(height: 0,),
 
