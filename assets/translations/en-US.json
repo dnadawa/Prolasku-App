@@ -66,5 +66,9 @@
   "billingShippingAddress": "Billing/Shipping Address",
   "shipToADifferentAddress": "Ship to a different address?",
   "differentShippingAddress": "Different Shipping Address",
-  "placeTheOrder": "Place the Order"
+  "placeTheOrder": "Place the Order",
+  "orderConfirmed": "Order Confirmed",
+  "yourOrderNoIs": "Your order number is",
+  "thankYouOrder": "Thank you for your order and we recieved your order request.",
+  "shopMore": "Shop more"
 }

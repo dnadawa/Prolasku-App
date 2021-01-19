@@ -23,6 +23,7 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        automaticallyImplyLeading: false,
         title: Container(
             height: ScreenUtil().setHeight(120),
             child: Image.asset('assets/images/logo.png')

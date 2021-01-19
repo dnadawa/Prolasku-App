@@ -1,6 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:prolasku/screens/order-confirmation.dart';
 import 'package:prolasku/widgets/button.dart';
 import 'package:prolasku/widgets/custom-text.dart';
 import 'package:prolasku/widgets/input-field.dart';
@@ -243,7 +245,12 @@ class _CheckoutState extends State<Checkout> with SingleTickerProviderStateMixin
               child: SizedBox(
                   width: double.infinity,
                   height: ScreenUtil().setHeight(100),
-                  child: Button(text: tr('placeTheOrder'),onPressed: (){})),
+                  child: Button(text: tr('placeTheOrder'),onPressed: (){
+                    Navigator.push(
+                        context,
+                        CupertinoPageRoute(builder: (context) => OrderConfirm())
+                    );
+                  })),
             )
 
 
