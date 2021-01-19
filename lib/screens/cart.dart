@@ -1,7 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:prolasku/screens/checkout.dart';
 import 'package:prolasku/widgets/button.dart';
 import 'package:prolasku/widgets/custom-text.dart';
 
@@ -167,7 +169,12 @@ class _CartState extends State<Cart> {
                 height: ScreenUtil().setHeight(100),
                 child: Button(
                   text: tr('checkout'),
-                  onPressed: (){},
+                  onPressed: (){
+                    Navigator.push(
+                        context,
+                        CupertinoPageRoute(builder: (context) => Checkout())
+                    );
+                  },
                 ),
               ),
             )

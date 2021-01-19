@@ -61,6 +61,22 @@ class More extends StatelessWidget {
           ),
           Divider(height: 0,),
 
+
+          ///order history
+          ListTile(
+            contentPadding: EdgeInsets.fromLTRB(ScreenUtil().setWidth(60),0,ScreenUtil().setWidth(30),0),
+            leading: Icon(Icons.history,color: Theme.of(context).accentColor),
+            title: CustomText(text: tr('orderHistory'),isBold: false,align: TextAlign.start,),
+            trailing: Icon(Icons.chevron_right,color: Colors.black,),
+            onTap: (){
+              Navigator.push(
+                  context,
+                  CupertinoPageRoute(builder: (context) => Profile())
+              );
+            },
+          ),
+          Divider(height: 0,),
+
           ///profile
           ListTile(
             contentPadding: EdgeInsets.fromLTRB(ScreenUtil().setWidth(60),0,ScreenUtil().setWidth(30),0),

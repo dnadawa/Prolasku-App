@@ -61,5 +61,10 @@
   "addToCart": "Add to cart",
   "myCart": "My Cart",
   "checkout": "Checkout",
-  "total": "Total"
+  "total": "Total",
+  "orderHistory": "Order History",
+  "billingShippingAddress": "Billing/Shipping Address",
+  "shipToADifferentAddress": "Ship to a different address?",
+  "differentShippingAddress": "Different Shipping Address",
+  "placeTheOrder": "Place the Order"
 }
