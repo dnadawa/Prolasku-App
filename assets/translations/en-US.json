@@ -55,5 +55,8 @@
   "billingEmail": "Billing Email",
   "website": "Website",
   "signUpForNewsletter": "Signup for newsletter",
-  "update": "Update"
+  "update": "Update",
+  "vat": "VAT",
+  "availableInStock": "available in stock",
+  "addToCart": "Add to cart"
 }

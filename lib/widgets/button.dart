@@ -8,8 +8,9 @@ class Button extends StatelessWidget {
   final double borderRadius;
   final Function onPressed;
   final double fontSize;
+  final bool isCart;
 
-  const Button({Key key, this.text, this.borderRadius=40, this.onPressed, this.fontSize=40}) : super(key: key);
+  const Button({Key key, this.text, this.borderRadius=40, this.onPressed, this.fontSize=40, this.isCart=false}) : super(key: key);
 
 
 
@@ -21,7 +22,24 @@ class Button extends StatelessWidget {
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadius)
       ),
-      child: CustomText(text: text,color: Colors.white,size: ScreenUtil().setHeight(fontSize),),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CustomText(text: text,color: Colors.white,size: ScreenUtil().setHeight(fontSize),),
+          if(isCart)
+            SizedBox(width: ScreenUtil().setWidth(40),),
+          if(isCart)
+          Container(
+            width: ScreenUtil().setWidth(50),
+            height: ScreenUtil().setWidth(50),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: Icon(Icons.shopping_cart,color: Theme.of(context).accentColor,size: 18,),
+          )
+        ],
+      ),
     );
   }
 }

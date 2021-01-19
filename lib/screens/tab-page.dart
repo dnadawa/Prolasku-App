@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_snake_navigationbar/flutter_snake_navigationbar.dart';
 import 'package:prolasku/screens/coupons.dart';
 import 'package:prolasku/screens/more.dart';
+import 'package:prolasku/screens/products.dart';
 import 'home.dart';
 
 class TabPage extends StatefulWidget {
@@ -59,7 +60,7 @@ class _TabPageState extends State<TabPage> with SingleTickerProviderStateMixin{
         physics: NeverScrollableScrollPhysics(),
         children: [
             Home(),
-            Home(),
+            Products(),
             Coupons(),
             Home(),
             More(),

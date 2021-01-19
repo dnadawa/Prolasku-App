@@ -10,7 +10,9 @@ class CustomText extends StatelessWidget {
   final bool isBold;
   final String font;
   final double height;
-  const CustomText({Key key, this.text, this.size, this.color=Colors.black, this.align=TextAlign.center, this.isBold=true, this.font, this.height}) : super(key: key);
+  final TextOverflow overflow;
+  final int maxLines;
+  const CustomText({Key key, this.text, this.size, this.color=Colors.black, this.align=TextAlign.center, this.isBold=true, this.font, this.height, this.overflow, this.maxLines}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +27,8 @@ class CustomText extends StatelessWidget {
 
     return Text(
       text,
+      overflow: overflow,
+      maxLines: maxLines,
       textAlign: align,
       style: font==null?style:font=='ubuntu'?GoogleFonts.ubuntu(textStyle: style):GoogleFonts.josefinSans(textStyle: style),
     );
