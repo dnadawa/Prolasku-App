@@ -5,10 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:prolasku/screens/more/newsletter.dart';
-import 'package:prolasku/widgets/button.dart';
 import 'package:prolasku/widgets/coupon-card.dart';
 import 'package:prolasku/widgets/custom-text.dart';
 import 'package:prolasku/widgets/marquee.dart';
+
+import 'cart.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -32,7 +33,12 @@ class _HomeState extends State<Home> {
             backgroundColor: Theme.of(context).primaryColor,
             child: IconButton(
               icon: Icon(CupertinoIcons.cart,color: Theme.of(context).accentColor,),
-              onPressed: (){},),
+              onPressed: (){
+                Navigator.push(
+                    context,
+                    CupertinoPageRoute(builder: (context) => Cart())
+                );
+              },),
           ),
           SizedBox(width: ScreenUtil().setWidth(20),),
           CircleAvatar(

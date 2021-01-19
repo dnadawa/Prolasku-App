@@ -58,5 +58,8 @@
   "update": "Update",
   "vat": "VAT",
   "availableInStock": "available in stock",
-  "addToCart": "Add to cart"
+  "addToCart": "Add to cart",
+  "myCart": "My Cart",
+  "checkout": "Checkout",
+  "total": "Total"
 }
