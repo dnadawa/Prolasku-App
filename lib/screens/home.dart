@@ -39,6 +39,7 @@ class _HomeState extends State<Home> {
   SharedPreferences prefs;
   String location = 'n/a';
   String locationID;
+  String language;
 
   getDiscounts() async {
     String url = Constants.apiEndpoint+"get_discounted_items/?username=${env['API_USERNAME']}&password=${env['API_PASSWORD']}&start=0&limit=6";
@@ -88,6 +89,7 @@ class _HomeState extends State<Home> {
     setState(() {
       location = prefs.getString('location');
       locationID = prefs.getString('locationID');
+      language = context.locale.toString().toLowerCase();
     });
   }
 
@@ -251,24 +253,47 @@ class _HomeState extends State<Home> {
                         itemBuilder: (context,i){
 
                           String image;
+                          String description;
+                          List images;
                           if(latestProducts[i]['images'].length>0){
                             image = latestProducts[i]['images'][0]['URL'];
+                            images = latestProducts[i]['images'];
                           }
                           else{
                             image = '';
+                            images = [];
                           }
 
-                          // print(context.locale.toString().toLowerCase());
-                          String name = latestProducts[i]['product_name']['en_gb'];
+                          String name = latestProducts[i]['product_name'][language];
+                          try{
+                             description = latestProducts[i]['product_desc'][language];
+                          }catch(e){
+                            description = "";
+                          }
+                          String id = latestProducts[i]['pid'];
+                          int discount = latestProducts[i]['discount'];
+                          String vat = latestProducts[i]['vat'];
+                          List stockData = latestProducts[i]['stock_data'];
+                          int stockAlert = latestProducts[i]['stock_alert_qty'];
 
-                          Currency euro = Currency.create('EUR', 2, symbol: '€', invertSeparators: true, pattern: 'S0,00');
+                          Currency euro = Currency.create('EUR', 2, symbol: '€', invertSeparators: true, pattern: '0,00S');
                           Money price = Money.from(latestProducts[i]['price'], euro);
 
                           return GestureDetector(
                             onTap: (){
                               Navigator.push(
                                   context,
-                                  CupertinoPageRoute(builder: (context) => ProductDetails())
+                                  CupertinoPageRoute(builder: (context) => ProductDetails(
+                                    productID: id,
+                                    name: name,
+                                    discount: discount,
+                                    images: images,
+                                    price: price.toString(),
+                                    vat: vat,
+                                    description: description,
+                                    stockData: stockData,
+                                    stockAlert: stockAlert,
+                                  ))
                               );
                             },
                             child: SizedBox(

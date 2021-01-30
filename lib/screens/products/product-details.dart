@@ -1,17 +1,66 @@
+import 'dart:convert';
+
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:prolasku/widgets/button.dart';
 import 'package:prolasku/widgets/custom-text.dart';
 import 'package:prolasku/widgets/marquee.dart';
+import 'package:http/http.dart' as http;
+import '../../constants.dart';
 
-class ProductDetails extends StatelessWidget {
+class ProductDetails extends StatefulWidget {
+  final String productID;
+  final String name;
+  final int discount;
+  final List images;
+  final List stockData;
+  final String price;
+  final String vat;
+  final String description;
+  final int stockAlert;
+
+  const ProductDetails({Key key, this.productID, this.name, this.discount, this.images, this.price, this.vat, this.description, this.stockData, this.stockAlert}) : super(key: key);
+  @override
+  _ProductDetailsState createState() => _ProductDetailsState();
+}
+
+class _ProductDetailsState extends State<ProductDetails> {
+
+
+
+    Future<String> getLocations(String locationID) async {
+
+      String url = Constants.apiEndpoint+"get_locations/?username=${env['API_USERNAME']}&password=${env['API_PASSWORD']}&location_id=$locationID";
+      var response = await http.post(
+        url,
+        headers: {
+          'Authorization1': env['API_KEY'],
+          'Content-Type': 'application/json'
+        },
+      );
+      if(response.statusCode==200){
+        var body = jsonDecode(response.body);
+        String location = body['OUTPUT'][0]["name"];
+        return location;
+      }
+      else{
+        print('error'+response.statusCode.toString());
+        print(response.body);
+        return 'Error';
+      }
+    }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: CustomText(text: 'Biscuit Packet',font: 'ubuntu',),
+        title: MarqueeWidget(child: CustomText(text: widget.name,font: 'ubuntu',)),
         elevation: 0,
         centerTitle: true,
       ),
@@ -24,10 +73,25 @@ class ProductDetails extends StatelessWidget {
               height: ScreenUtil().setHeight(400),
               child: Stack(
                 children: [
-                  Padding(
-                    padding: EdgeInsets.all(ScreenUtil().setWidth(15)),
-                    child: Center(child: Image.network('https://e7.pngegg.com/pngimages/546/822/png-clipart-biscuit-wafer-weight-petit-beurre-biscuit-wafer-biscuits-thumbnail.png')),
+                  CarouselSlider.builder(
+                    options: CarouselOptions(
+                      viewportFraction: 1,
+                      enableInfiniteScroll: false
+                    ),
+                    itemCount: widget.images.length,
+                    itemBuilder: (context,i){
+                      String image = widget.images[i]["URL"];
+                      print(image);
+                      return Center(
+                        child: CachedNetworkImage(
+                          imageUrl: image,
+                          placeholder: (context,x)=>Icon(Icons.no_photography,size: 50,),
+                          errorWidget: (context,x,error)=>Icon(Icons.no_photography,size: 50,),
+                        ),
+                      );
+                    },
                   ),
+                  if(widget.discount!=0)
                   Align(
                     alignment: Alignment.bottomRight,
                     child: Container(
@@ -43,7 +107,7 @@ class ProductDetails extends StatelessWidget {
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      CustomText(text: "20%",size: ScreenUtil().setSp(35),font: 'josefin',),
+                                      CustomText(text: widget.discount.toString()+"%",size: ScreenUtil().setSp(35),font: 'josefin',),
                                       CustomText(text: tr('discount'),size: ScreenUtil().setSp(20),font: 'josefin',),
                                     ],
                                   ),
@@ -63,8 +127,9 @@ class ProductDetails extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.baseline,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  CustomText(text: '50,00\$',font: 'josefin',size: ScreenUtil().setSp(60),color: Colors.red,),
+                  CustomText(text: widget.price,font: 'josefin',size: ScreenUtil().setSp(60),color: Colors.red,),
                   SizedBox(width: ScreenUtil().setWidth(8),),
+                  if(widget.discount!=0)
                   Text('90,00\$',style: GoogleFonts.josefinSans(
                       fontSize: ScreenUtil().setSp(35),
                       color: Colors.black,
@@ -73,7 +138,7 @@ class ProductDetails extends StatelessWidget {
                       fontStyle: FontStyle.italic
                   ),),
                   SizedBox(width: ScreenUtil().setWidth(8),),
-                  CustomText(text: '(${tr('vat')} 14%)',size: ScreenUtil().setSp(25),isBold: false,),
+                  CustomText(text: '(${tr('vat')} ${widget.vat}%)',size: ScreenUtil().setSp(25),isBold: false,),
                 ],
               ),
             ),
@@ -81,106 +146,80 @@ class ProductDetails extends StatelessWidget {
             ///stocks
             Padding(
               padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(30)),
-              child: ListView(
+              child: ListView.builder(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
-                children: [
-                  Padding(
-                    padding: EdgeInsets.all(ScreenUtil().setWidth(10)),
-                    child: Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(color: Colors.black, width: 2)
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.all(ScreenUtil().setWidth(15)),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            ///dot
-                            CircleAvatar(
-                              backgroundColor: Theme.of(context).accentColor,
-                              radius: 5,
-                            ),
-                            SizedBox(width: ScreenUtil().setWidth(20),),
-                            ///stock location
-                            SizedBox(
-                                width: ScreenUtil().setWidth(550),
-                                child: CustomText(text: '24 '+tr('availableInStock')+" :- Helsinki",font: 'josefin',size: ScreenUtil().setSp(35),align: TextAlign.start,)),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(ScreenUtil().setWidth(10)),
-                    child: Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(color: Colors.black, width: 2)
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.all(ScreenUtil().setWidth(15)),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            ///dot
-                            CircleAvatar(
-                              backgroundColor: Theme.of(context).accentColor,
-                              radius: 5,
-                            ),
-                            SizedBox(width: ScreenUtil().setWidth(20),),
-                            ///stock location
-                            SizedBox(
-                                width: ScreenUtil().setWidth(550),
-                                child: CustomText(text: '24 '+tr('availableInStock')+" :- Helsinki",font: 'josefin',size: ScreenUtil().setSp(35),align: TextAlign.start,)),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(ScreenUtil().setWidth(10)),
-                    child: Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(color: Colors.black, width: 2)
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.all(ScreenUtil().setWidth(15)),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            ///dot
-                            CircleAvatar(
-                              backgroundColor: Theme.of(context).accentColor,
-                              radius: 5,
-                            ),
-                            SizedBox(width: ScreenUtil().setWidth(20),),
-                            ///stock location
-                            SizedBox(
-                                width: ScreenUtil().setWidth(550),
-                                child: CustomText(text: '24 '+tr('availableInStock')+" :- Helsinki",font: 'josefin',size: ScreenUtil().setSp(35),align: TextAlign.start,)),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
+                itemCount: widget.stockData.length,
+                itemBuilder: (context,i){
 
-                ],
+                  int stock = widget.stockData[i]['stock'];
+
+                  return FutureBuilder(
+                    future: getLocations(widget.stockData[i]['location_id'].toString()),
+                    builder: (context,snapshot){
+                      if(snapshot.hasData) {
+                        return Padding(
+                          padding: EdgeInsets.all(ScreenUtil().setWidth(10)),
+                          child: Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(5),
+                                border: Border.all(
+                                    color: Colors.black, width: 2)
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.all(
+                                  ScreenUtil().setWidth(15)),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+
+                                  ///dot
+                                  CircleAvatar(
+                                    backgroundColor:
+                                    stock > widget.stockAlert ? Theme
+                                        .of(context)
+                                        .accentColor :
+                                    stock <= widget.stockAlert && stock < 0
+                                        ? Colors.orange
+                                        :
+                                    stock <= 0 ? Colors.red :
+                                    stock <= widget.stockAlert && stock > 0
+                                        ? Colors.orange
+                                        :
+                                    Colors.transparent
+                                    ,
+                                    radius: 5,
+                                  ),
+                                  SizedBox(width: ScreenUtil().setWidth(20),),
+
+                                  ///stock location
+                                  SizedBox(
+                                      width: ScreenUtil().setWidth(550),
+                                      child: CustomText(text: '$stock ' +
+                                          tr('availableInStock') + " :- " +
+                                          snapshot.data,
+                                        font: 'josefin',
+                                        size: ScreenUtil().setSp(35),
+                                        align: TextAlign.start,)),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      }else{
+                        return Center(child: CircularProgressIndicator(),);
+                      }
+                    },
+                  );
+
+                },
               ),
             ),
-            
-            
+
+
             ///box
             Padding(
               padding: EdgeInsets.all(ScreenUtil().setWidth(30)),
@@ -195,12 +234,12 @@ class ProductDetails extends StatelessWidget {
                   children: [
                     Padding(
                       padding: EdgeInsets.all(ScreenUtil().setWidth(30)),
-                      child: CustomText(text: 'Biscuit Packet',font: 'josefin',size: ScreenUtil().setSp(40),),
+                      child: CustomText(text: widget.name,font: 'josefin',size: ScreenUtil().setSp(40),),
                     ),
                     Padding(
                       padding: EdgeInsets.all(ScreenUtil().setWidth(30)),
                       child: CustomText(
-                        text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In eget libero ac libero porttitor rutrum. Etiam a nisl elit. Duis blandit sem eu justo pretium, eu commodo nisl lacinia. Aliquam viverra risus non laoreet blandit. Maecenas lacus purus, eleifend sit amet metus eu, euismod auctor turpis. Aenean sodales nunc odio, a pharetra eros congue a. Vivamus tincidunt pellentesque elit, at maximus enim feugiat ac. Fusce suscipit, nibh et vulputate efficitur, tortor arcu malesuada nisl, in molestie leo elit eu massa. Sed tempor nibh a sapien blandit sollicitudin.",
+                        text: widget.description,
                         isBold: false,
                         size: ScreenUtil().setSp(28),
                         align: TextAlign.start,
@@ -224,7 +263,7 @@ class ProductDetails extends StatelessWidget {
               ),
             ),
             SizedBox(height: ScreenUtil().setHeight(80),)
-            
+
           ],
         ),
       ),

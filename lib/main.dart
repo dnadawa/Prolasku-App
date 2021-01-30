@@ -12,9 +12,9 @@ Future<void> main() async {
   await DotEnv.load(fileName: '.env');
   runApp(
     EasyLocalization(
-        supportedLocales: [Locale('en', 'US'), Locale('fi', 'FI')],
+        supportedLocales: [Locale('en', 'GB'), Locale('fi', 'FI')],
         path: 'assets/translations',
-        fallbackLocale: Locale('en', 'US'),
+        fallbackLocale: Locale('en', 'GB'),
         child: MyApp()
     ),
   );
