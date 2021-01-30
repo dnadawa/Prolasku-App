@@ -15,14 +15,13 @@ class TabPage extends StatefulWidget {
 
 class _TabPageState extends State<TabPage> with SingleTickerProviderStateMixin{
 
+
   TabController _controller;
-  int _index;
 
   @override
   void initState() {
     super.initState();
-    _controller = TabController(length: 5, vsync: this);
-    _index = 0;
+    _controller = TabController(length: 5, vsync: this,initialIndex: 0);
   }
 
   @override
@@ -41,12 +40,11 @@ class _TabPageState extends State<TabPage> with SingleTickerProviderStateMixin{
         selectedItemColor: Theme.of(context).accentColor,
         unselectedItemColor: Colors.black.withOpacity(0.3),
         backgroundColor: Theme.of(context).primaryColor,
-        currentIndex: _index,
+        currentIndex: _controller.index,
         onTap: (index){
           setState(() {
-            _index = index;
+            _controller.animateTo(index);
           });
-          _controller.animateTo(_index);
         },
         items: [
           BottomNavigationBarItem(icon: Icon(CupertinoIcons.house_fill), label: tr('home')),
@@ -60,7 +58,7 @@ class _TabPageState extends State<TabPage> with SingleTickerProviderStateMixin{
         controller: _controller,
         physics: NeverScrollableScrollPhysics(),
         children: [
-            Home(),
+            Home(controller: _controller,),
             Products(),
             Coupons(),
             Receipts(),

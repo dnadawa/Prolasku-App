@@ -7,8 +7,10 @@ class RadioListItem extends StatelessWidget {
 
   final Widget leading;
   final String title;
+  final Function onChange;
+  final String selected;
 
-  const RadioListItem({Key key, this.leading, this.title}) : super(key: key);
+  const RadioListItem({Key key, this.leading, this.title, this.onChange, this.selected}) : super(key: key);
 
 
   @override
@@ -35,11 +37,12 @@ class RadioListItem extends StatelessWidget {
           Expanded(
             child: RadioListTile(
               title: CustomText(text: title,isBold: false,),
-              value: 'a',
-              groupValue: 'asd',
-              onChanged: (s){},
+              value: title,
+              groupValue: selected,
+              onChanged: onChange,
               controlAffinity: ListTileControlAffinity.trailing,
               activeColor: Theme.of(context).accentColor,
+
             ),
           ),
         ],

@@ -24,6 +24,8 @@ class _ProductsState extends State<Products> {
         elevation: 0,
         centerTitle: true,
         actions: [
+
+          ///list view
           Material(
             elevation: 5,
             shape: CircleBorder(),
@@ -40,6 +42,8 @@ class _ProductsState extends State<Products> {
               ),
             ),
           ),
+
+          ///grid view
           Padding(
             padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(15)),
             child: Material(
@@ -59,20 +63,71 @@ class _ProductsState extends State<Products> {
               ),
             ),
           ),
+
+          ///filter
           Padding(
             padding: EdgeInsets.only(right: ScreenUtil().setWidth(10)),
             child: Material(
               elevation: 5,
               shape: CircleBorder(),
-              child: CircleAvatar(
-                radius: 18,
-                backgroundColor: Colors.white,
-                child: Icon(Icons.filter_list_alt,color: Theme.of(context).accentColor,size: 20,),
+              child: GestureDetector(
+                onTap: ()=>ScaffoldState().openEndDrawer(),
+                child: CircleAvatar(
+                  radius: 18,
+                  backgroundColor: Colors.white,
+                  child: Icon(Icons.filter_list_alt,color: Theme.of(context).accentColor,size: 20,),
+                ),
               ),
             ),
           )
         ],
       ),
+
+      endDrawer: Drawer(
+          child: DefaultTabController(
+            length: 4,
+            child: Scaffold(
+              appBar: AppBar(
+                title: CustomText(text: tr('filter'),font: 'ubuntu',),
+                elevation: 0,
+                centerTitle: true,
+                automaticallyImplyLeading: false,
+                bottom: TabBar(
+                  isScrollable: true,
+                  tabs: [
+                    Tab(text: 'Price',),
+                    Tab(text: 'Categories',),
+                    Tab(text: 'Brands',),
+                    Tab(text: 'Stock',),
+                  ],
+                ),
+              ),
+
+              body: Padding(
+                padding:  EdgeInsets.all(ScreenUtil().setHeight(20)),
+                child: ListView(
+                  children: [
+                    Row(
+                      children: [
+                        Checkbox(value: true, onChanged: (val){},),
+                        CustomText(text: 'Rice Bags',align: TextAlign.start,),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Checkbox(value: true, onChanged: (val){},),
+                        CustomText(text: 'Rice Bags',align: TextAlign.start,),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+
+
+            ),
+          ),
+      ),
+
 
       body: isListView?ProductsListView():ProductsGridView(),
     );

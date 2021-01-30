@@ -1,22 +1,110 @@
+import 'dart:convert';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:money2/money2.dart';
+import 'package:prolasku/main.dart';
 import 'package:prolasku/screens/more/newsletter.dart';
+import 'package:prolasku/screens/products.dart';
+import 'package:prolasku/screens/products/product-details.dart';
+import 'package:prolasku/screens/tab-page.dart';
 import 'package:prolasku/widgets/coupon-card.dart';
 import 'package:prolasku/widgets/custom-text.dart';
 import 'package:prolasku/widgets/marquee.dart';
-
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import '../constants.dart';
 import 'cart.dart';
 
 class Home extends StatefulWidget {
+
+  final TabController controller;
+
+  const Home({Key key, this.controller}) : super(key: key);
+
   @override
   _HomeState createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
+
+  List discountedItems;
+  List latestProducts;
+  SharedPreferences prefs;
+  String location = 'n/a';
+  String locationID;
+
+  getDiscounts() async {
+    String url = Constants.apiEndpoint+"get_discounted_items/?username=${env['API_USERNAME']}&password=${env['API_PASSWORD']}&start=0&limit=6";
+    var response = await http.post(
+      url,
+      headers: {
+        'Authorization1': env['API_KEY'],
+        'Content-Type': 'application/json'
+      },
+    );
+    if(response.statusCode==200){
+      var body = jsonDecode(response.body);
+      setState(() {
+        discountedItems = body['OUTPUT'];
+      });
+      print(body['OUTPUT'].length);
+    }
+    else{
+      print('error'+response.statusCode.toString());
+      print(response.body);
+    }
+  }
+  getLatestProducts() async {
+    await getLocation();
+    String url = Constants.apiEndpoint+"get_products/?username=${env['API_USERNAME']}&password=${env['API_PASSWORD']}&start=0&limit=6&order=Desc&location_id=$locationID";
+    print(url);
+    var response = await http.post(
+      url,
+      headers: {
+        'Authorization1': env['API_KEY'],
+        'Content-Type': 'application/json'
+      },
+    );
+    if(response.statusCode==200){
+      var body = jsonDecode(response.body);
+      setState(() {
+        latestProducts = body['OUTPUT'];
+      });
+    }
+    else{
+      print('error'+response.statusCode.toString());
+      print(response.body);
+    }
+  }
+  getLocation() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      location = prefs.getString('location');
+      locationID = prefs.getString('locationID');
+    });
+  }
+
+
+  getData()async{
+    await getLatestProducts();
+    getDiscounts();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getData();
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,7 +188,7 @@ class _HomeState extends State<Home> {
                         child: Image.asset('assets/images/shop.png')
                     ),
                     SizedBox(width: ScreenUtil().setWidth(30),),
-                    CustomText(text: "Sanjuwa's Shop",size: ScreenUtil().setSp(30),)
+                    CustomText(text: location,size: ScreenUtil().setSp(30),)
                   ],
                 ),
               ),
@@ -139,79 +227,86 @@ class _HomeState extends State<Home> {
                         ),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(25)),
-                          child: CustomText(text: tr('seeMore'),isBold: false,color: Theme.of(context).accentColor,),
+                          child: GestureDetector(
+                              onTap: (){
+                                Navigator.push(
+                                    context,
+                                    CupertinoPageRoute(builder: (context) => Products())
+                                );
+                              },
+                              child: CustomText(text: tr('seeMore'),isBold: false,color: Theme.of(context).accentColor,)),
                         )
                       ],
                     ),
                     SizedBox(height: ScreenUtil().setHeight(30),),
                     Padding(
                       padding: EdgeInsets.all(ScreenUtil().setHeight(30)),
-                      child: CarouselSlider(
+                      child: latestProducts!=null?CarouselSlider.builder(
+                        itemCount: latestProducts.length,
                         options: CarouselOptions(
                           viewportFraction: 0.5,
                           enableInfiniteScroll: false,
                           aspectRatio: 13/9
                         ),
-                        items: [
-                          SizedBox(
-                            width: ScreenUtil().setWidth(400),
-                            child: Card(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                                side: BorderSide(color: Theme.of(context).accentColor,width: 3)
-                              ),
-                              elevation: 5,
-                              color: Colors.white,
-                              child: Column(
-                                children: [
-                                  Expanded(
-                                      child: Padding(
-                                        padding: EdgeInsets.all(ScreenUtil().setWidth(15)),
-                                        child: Image.network("https://www.kindpng.com/picc/m/333-3334016_packet-biscuit-png-transparent-png.png"),
-                                      )
-                                  ),
-                                  CustomText(text: 'Rice Bags',font: 'josefin',),
-                                  Padding(
-                                    padding: EdgeInsets.all(ScreenUtil().setWidth(15)),
-                                    child: CustomText(text: '\$250.00',font: 'josefin',color: Theme.of(context).accentColor,),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            width: ScreenUtil().setWidth(400),
-                            child: Card(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                                side: BorderSide(color: Theme.of(context).accentColor,width: 3)
-                              ),
-                              elevation: 5,
-                              color: Colors.white,
-                              child: Column(
-                                children: [
-                                  Expanded(
-                                      child: Padding(
-                                        padding: EdgeInsets.all(ScreenUtil().setWidth(15)),
-                                        child: Image.network("https://www.pngkey.com/png/full/72-724445_our-products-pasta-packet-in-india.png"),
-                                      )
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(15)),
-                                    child: MarqueeWidget(
-                                        child: CustomText(text: 'Rice Bags of the namely co-ordinated under many curcumferences incods',font: 'josefin',)
+                        itemBuilder: (context,i){
+
+                          String image;
+                          if(latestProducts[i]['images'].length>0){
+                            image = latestProducts[i]['images'][0]['URL'];
+                          }
+                          else{
+                            image = '';
+                          }
+
+                          // print(context.locale.toString().toLowerCase());
+                          String name = latestProducts[i]['product_name']['en_gb'];
+
+                          Currency euro = Currency.create('EUR', 2, symbol: '€', invertSeparators: true, pattern: 'S0,00');
+                          Money price = Money.from(latestProducts[i]['price'], euro);
+
+                          return GestureDetector(
+                            onTap: (){
+                              Navigator.push(
+                                  context,
+                                  CupertinoPageRoute(builder: (context) => ProductDetails())
+                              );
+                            },
+                            child: SizedBox(
+                              width: ScreenUtil().setWidth(400),
+                              child: Card(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    side: BorderSide(color: Theme.of(context).accentColor,width: 3)
+                                ),
+                                elevation: 5,
+                                color: Colors.white,
+                                child: Column(
+                                  children: [
+                                    Expanded(
+                                        child: Padding(
+                                          padding: EdgeInsets.all(ScreenUtil().setWidth(15)),
+                                          child: CachedNetworkImage(
+                                            imageUrl: image,
+                                            placeholder: (context,x)=>Icon(Icons.no_photography,size: 50,),
+                                            errorWidget: (context,x,error)=>Icon(Icons.no_photography,size: 50,),
+                                          ),
+                                        )
                                     ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.all(ScreenUtil().setWidth(15)),
-                                    child: CustomText(text: '\$250.00',font: 'josefin',color: Theme.of(context).accentColor,),
-                                  ),
-                                ],
+                                    Padding(
+                                      padding:  EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(15)),
+                                      child: MarqueeWidget(child: CustomText(text: name,font: 'josefin',)),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.all(ScreenUtil().setWidth(15)),
+                                      child: CustomText(text: price.toString(),font: 'josefin',color: Theme.of(context).accentColor,),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
+                          );
+                        },
+                      ):Center(child: CircularProgressIndicator(),),
                     )
                   ],
                 ),
@@ -318,93 +413,110 @@ class _HomeState extends State<Home> {
                     SizedBox(height: ScreenUtil().setHeight(30),),
                     Padding(
                       padding: EdgeInsets.all(ScreenUtil().setHeight(30)),
-                      child: CarouselSlider(
+                      child: discountedItems!=null?CarouselSlider.builder(
+                        itemCount: discountedItems.length,
                         options: CarouselOptions(
                           viewportFraction: 0.5,
-                          enableInfiniteScroll: true,
-                          aspectRatio: 13/9
+                          aspectRatio: 13/9,
+                          enableInfiniteScroll: false,
                           // height: ScreenUtil().setHeight(400)
                         ),
-                        items: [
-                          SizedBox(
-                            width: ScreenUtil().setWidth(400),
-                            child: Card(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                  side: BorderSide(color: Theme.of(context).accentColor,width: 3)
-                              ),
-                              elevation: 5,
-                              color: Colors.white,
-                              child: Column(
-                                children: [
-                                  Expanded(
-                                      child: Stack(
-                                        children: [
-                                          Padding(
-                                            padding: EdgeInsets.all(ScreenUtil().setWidth(15)),
-                                            child: Center(child: Image.network("https://images.kglobalservices.com/www.leggomyeggo.com/en_us/product/product_4821901/kicproductimage-122854_00038000492747_c1l1.png")),
-                                          ),
-                                          Padding(
-                                            padding: EdgeInsets.fromLTRB(0,0,ScreenUtil().setWidth(10),ScreenUtil().setWidth(20)),
-                                            child: Align(
-                                              alignment: Alignment.bottomRight,
-                                              child: Container(
-                                                  height: ScreenUtil().setHeight(130),
-                                                  width: ScreenUtil().setHeight(130),
-                                                  child: Stack(
-                                                    children: [
-                                                      Image.asset('assets/images/discount.png'),
-                                                      Align(
-                                                          alignment: Alignment.bottomCenter,
-                                                          child: Padding(
-                                                            padding: EdgeInsets.only(top: ScreenUtil().setHeight(25)),
-                                                            child: Column(
-                                                              mainAxisAlignment: MainAxisAlignment.center,
-                                                              children: [
-                                                                CustomText(text: '99%',size: ScreenUtil().setSp(38),font: 'josefin',color: Colors.white,),
-                                                                CustomText(text: tr('discount'),size: ScreenUtil().setSp(20),font: 'josefin',color: Colors.white,),
-                                                              ],
-                                                            ),
-                                                          ))
-                                                    ],
-                                                  )
-                                              ),
-                                            ),
-                                          )
-                                        ],
-                                      )
-                                  ),
-                                  CustomText(text: 'Rice Bags',font: 'josefin',),
-                                  Padding(
-                                    padding: EdgeInsets.all(ScreenUtil().setWidth(15)),
-                                    child: RichText(
-                                        text: TextSpan(
-                                          text: '\$150.00 ',
-                                          style: GoogleFonts.josefinSans(
-                                            color: Colors.red,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: ScreenUtil().setSp(30)
-                                          ),
+                        itemBuilder: (context,i){
+                          String image;
+                          if(discountedItems[i]['images'].length>0){
+                            image = discountedItems[i]['images'][0]['URL'];
+                          }
+                          else{
+                            image = 'https://www.orientalheritageagra.com/wp-content/uploads/2019/03/product-png-image-59158.png';
+                          }
+
+                          return GestureDetector(
+                            onTap: (){
+                              Navigator.push(
+                                  context,
+                                  CupertinoPageRoute(builder: (context) => ProductDetails())
+                              );
+                            },
+                            child: SizedBox(
+                              width: ScreenUtil().setWidth(400),
+                              child: Card(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    side: BorderSide(color: Theme.of(context).accentColor,width: 3)
+                                ),
+                                elevation: 5,
+                                color: Colors.white,
+                                child: Column(
+                                  children: [
+                                    Expanded(
+                                        child: Stack(
                                           children: [
-                                            TextSpan(
-                                                text: '\$250.00',
-                                                style: GoogleFonts.josefinSans(
-                                                    color: Colors.black,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: ScreenUtil().setSp(20),
-                                                    decoration: TextDecoration.lineThrough
-                                                )
+                                            Padding(
+                                              padding: EdgeInsets.all(ScreenUtil().setWidth(15)),
+                                              child: Center(child: Image.network(image)),
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.fromLTRB(0,0,ScreenUtil().setWidth(10),ScreenUtil().setWidth(20)),
+                                              child: Align(
+                                                alignment: Alignment.bottomRight,
+                                                child: Container(
+                                                    height: ScreenUtil().setHeight(130),
+                                                    width: ScreenUtil().setHeight(130),
+                                                    child: Stack(
+                                                      children: [
+                                                        Image.asset('assets/images/discount.png'),
+                                                        Align(
+                                                            alignment: Alignment.bottomCenter,
+                                                            child: Padding(
+                                                              padding: EdgeInsets.only(top: ScreenUtil().setHeight(25)),
+                                                              child: Column(
+                                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                                children: [
+                                                                  CustomText(text: '99%',size: ScreenUtil().setSp(38),font: 'josefin',color: Colors.white,),
+                                                                  CustomText(text: tr('discount'),size: ScreenUtil().setSp(20),font: 'josefin',color: Colors.white,),
+                                                                ],
+                                                              ),
+                                                            ))
+                                                      ],
+                                                    )
+                                                ),
+                                              ),
                                             )
-                                          ]
-                                        ),
+                                          ],
+                                        )
                                     ),
-                                  ),
-                                ],
+                                    CustomText(text: 'name',font: 'josefin',),
+                                    Padding(
+                                      padding: EdgeInsets.all(ScreenUtil().setWidth(15)),
+                                      child: RichText(
+                                        text: TextSpan(
+                                            text: '\$150.00 ',
+                                            style: GoogleFonts.josefinSans(
+                                                color: Colors.red,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: ScreenUtil().setSp(30)
+                                            ),
+                                            children: [
+                                              TextSpan(
+                                                  text: '\$250.00',
+                                                  style: GoogleFonts.josefinSans(
+                                                      color: Colors.black,
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: ScreenUtil().setSp(20),
+                                                      decoration: TextDecoration.lineThrough
+                                                  )
+                                              )
+                                            ]
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
+                          );
+                        },
+                      ):Center(child: CircularProgressIndicator(),),
                     )
                   ],
                 ),

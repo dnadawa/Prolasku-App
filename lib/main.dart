@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:prolasku/screens/login.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart' as DotEnv;
+import 'package:prolasku/screens/register.dart';
 import 'package:prolasku/screens/tab-page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+Future<void> main() async {
+
+  await DotEnv.load(fileName: '.env');
   runApp(
     EasyLocalization(
         supportedLocales: [Locale('en', 'US'), Locale('fi', 'FI')],
@@ -15,7 +20,29 @@ void main() {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  
+  setDefaultLocation() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String location = prefs.getString('location');
+    if(location==null){
+      prefs.setString('location', "Helsinki Warehouse");
+      prefs.setString('locationID', '9');
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    setDefaultLocation();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(

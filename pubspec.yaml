@@ -32,6 +32,12 @@ dependencies:
   flutter_screenutil: ^4.0.2+3
   google_fonts: ^1.1.1
   carousel_slider: ^2.3.1
+  http: ^0.12.2
+  cached_network_image: ^2.5.0
+  shared_preferences: ^0.5.12+4
+  country_code_picker: ^1.7.0
+  flutter_dotenv: ^3.1.0
+  money2: ^1.4.3
 
 dev_dependencies:
   flutter_test:
@@ -53,6 +59,7 @@ flutter:
   assets:
     - assets/translations/
     - assets/images/
+    - .env
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
