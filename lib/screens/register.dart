@@ -1,16 +1,22 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:country_code_picker/country_code_picker.dart';
+import 'package:devicelocale/devicelocale.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 import 'package:prolasku/constants.dart';
 import 'package:prolasku/widgets/button.dart';
 import 'package:prolasku/widgets/custom-text.dart';
 import 'package:prolasku/widgets/input-field.dart';
 import 'package:http/http.dart' as http;
+import 'package:prolasku/widgets/toast.dart';
 
 class Register extends StatefulWidget {
   @override
@@ -23,29 +29,157 @@ class _RegisterState extends State<Register> {
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
   TextEditingController phone = TextEditingController();
-  String prefix;
+  String prefix, imageEncode;
+  File image;
+  ProgressDialog pr;
 
   signUp() async {
-    var url = Constants.apiEndpoint+"set_customer_register/?"
+    String language = await Devicelocale.currentLocale;
+    if(name.text!=''&&email.text!=''&&password.text!=''&&phone.text!=''&&imageEncode!=null){
+      pr.show();
+      var url = Constants.apiEndpoint+"set_customer_register/?"
+          "username=${env['API_USERNAME']}&"
+          "password=${env['API_PASSWORD']}&"
+          "email=${email.text}&"
+          "customer_password=${password.text}";
+
+      var response = await http.post(
+        url,
+        headers: {
+          'Authorization1': env['API_KEY'],
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: {
+          'firstname': name.text,
+          'phone_prefix': prefix,
+          'phone': phone.text,
+          'phone_full': prefix+phone.text,
+          'image': imageEncode,
+          'language': 'en_gb'
+        }
+      );
+      if(response.statusCode==200){
+        var body = jsonDecode(response.body);
+        String responseType = body['OUTPUT']['response_type'];
+        String message = body['OUTPUT']['message'];
+        pr.hide();
+        if(responseType=='success'){
+          ToastBar(text: message,color: Colors.green).show();
+          Navigator.pop(context);
+        }else{
+          ToastBar(text: message,color: Colors.red).show();
+        }
+
+      }
+      else{
+        print('error'+response.statusCode.toString());
+        pr.hide();
+        ToastBar(text: tr('emailSendingFailed'),color: Colors.red).show();
+      }
+    }
+    else{
+      ToastBar(text: tr('fillAllFields'),color: Colors.red).show();
+    }
+
+  }
+
+  checkCustomerExists()async{
+    pr = ProgressDialog(context);
+    pr = ProgressDialog(context,type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
+    pr.style(
+        message: 'Please wait...',
+        borderRadius: 10.0,
+        backgroundColor: Colors.white,
+        progressWidget: Center(child: CircularProgressIndicator()),
+        elevation: 10.0,
+        insetAnimCurve: Curves.easeInOut,
+        messageTextStyle: TextStyle(
+            color: Colors.black, fontSize: ScreenUtil().setSp(35), fontWeight: FontWeight.bold)
+    );
+    pr.show();
+    var url = Constants.apiEndpoint+"get_customer_exists/?"
         "username=${env['API_USERNAME']}&"
         "password=${env['API_PASSWORD']}&"
         "email=${email.text}&"
-        "customer_password=${password.text}&"
-        "phone_full=$prefix${phone.text}&"
-        "phone_prefix=$prefix&"
-        "phone=${phone.text}&"
-        "language=en_gb";
+        "customer_password=${password.text}";
 
-    print(url);
+    var response = await http.post(
+        url,
+        headers: {
+          'Authorization1': env['API_KEY'],
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+    );
+
+    if(response.statusCode==200){
+      var body = jsonDecode(response.body);
+      var isExists = body['OUTPUT']['TOTAL_COUNT'];
+      pr.hide();
+      if(isExists==0){
+        signUp();
+      }
+      else{
+        //forgot password
+        showCupertinoDialog(
+            context: context,
+            builder: (BuildContext context){
+                return CupertinoAlertDialog(
+                  title: CustomText(text: 'Forgot password',),
+                  content: CustomText(text: 'Would you like to send a new password to ${email.text}?',),
+                  actions: <Widget>[
+                    CupertinoDialogAction(
+                      isDefaultAction: true,
+                      child: CustomText(text: "Yes"),
+                      onPressed: ()=>forgotPassword(),
+                    ),
+                    CupertinoDialogAction(
+                      child: CustomText(text: "No"),
+                      onPressed: (){
+                        Navigator.pop(context);
+                      },
+                    )
+                  ],
+                );
+            });
+      }
+    }
+    else{
+      ToastBar(text: tr('somethingWrong'),color: Colors.red).show();
+    }
+  }
+
+  forgotPassword()async{
+    pr.show();
+    var url = Constants.apiEndpoint+"set_customer_password_reset_request/?"
+        "username=${env['API_USERNAME']}&"
+        "password=${env['API_PASSWORD']}&"
+        "email=${email.text}";
+
     var response = await http.post(
       url,
       headers: {
-      'Authorization1': env['API_KEY'],
-      'Content-Type': 'application/json'
-    },);
-    print(response.body.toString());
+        'Authorization1': env['API_KEY'],
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+    );
+    print(response.body);
+    if(response.statusCode==200){
+      var body = jsonDecode(response.body);
+      String status = body['OUTPUT']['response_type'];
+      String message = body['OUTPUT']['message'];
+      pr.hide();
+      if(status=='success'){
+        ToastBar(text: message,color: Colors.green).show();
+        Navigator.pop(context);
+      }else{
+        ToastBar(text: message,color: Colors.red).show();
+      }
+    }else{
+      pr.hide();
+      ToastBar(text: tr('somethingWrong'),color: Colors.red).show();
+    }
 
-    // print(url);
+
   }
 
   @override
@@ -85,10 +219,25 @@ class _RegisterState extends State<Register> {
                         ///profilePicture
                         CustomText(text: tr('uploadProfilePicture'),isBold: false,size: ScreenUtil().setSp(35),),
                         SizedBox(height: ScreenUtil().setHeight(30),),
-                        CircleAvatar(
-                          backgroundColor: Theme.of(context).accentColor,
-                          radius: 40,
-                          child: Icon(Icons.person,color: Colors.white,size: 50,),
+                        GestureDetector(
+                          onTap: ()async{
+                            final pickedFile = await ImagePicker().getImage(source: ImageSource.gallery);
+                            setState(() {
+                              if (pickedFile != null) {
+                                image = File(pickedFile.path);
+                                final bytes = image.readAsBytesSync();
+                                imageEncode = base64.encode(bytes);
+                              } else {
+                                ToastBar(text: tr('imageNotSelected'),color: Colors.red).show();
+                              }
+                            });
+                          },
+                          child: CircleAvatar(
+                            backgroundColor: Theme.of(context).accentColor,
+                            radius: 40,
+                            backgroundImage: image==null?null:FileImage(image),
+                            child: image==null?Icon(Icons.person,color: Colors.white,size: 50,):Container(),
+                          ),
                         ),
 
                         ///name
@@ -153,7 +302,7 @@ class _RegisterState extends State<Register> {
                         SizedBox(
                             width: double.infinity,
                             height: ScreenUtil().setHeight(100),
-                            child: Button(text: tr('signUp'),onPressed: ()=>signUp()))
+                            child: Button(text: tr('signUp'),onPressed: ()=>checkCustomerExists()))
                       ],
                     ),
                   ),

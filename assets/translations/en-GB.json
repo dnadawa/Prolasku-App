@@ -70,5 +70,9 @@
   "orderConfirmed": "Order Confirmed",
   "yourOrderNoIs": "Your order number is",
   "thankYouOrder": "Thank you for your order and we recieved your order request.",
-  "shopMore": "Shop more"
+  "shopMore": "Shop more",
+  "somethingWrong": "Something went wrong",
+  "imageNotSelected": "Image not selected!",
+  "fillAllFields": "Please fill all the fields!",
+  "emailSendingFailed": "Email sending failed!"
 }

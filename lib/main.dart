@@ -3,8 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:prolasku/screens/login.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart' as DotEnv;
-import 'package:prolasku/screens/register.dart';
-import 'package:prolasku/screens/tab-page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
@@ -14,7 +12,6 @@ Future<void> main() async {
     EasyLocalization(
         supportedLocales: [Locale('en', 'GB'), Locale('fi', 'FI')],
         path: 'assets/translations',
-        fallbackLocale: Locale('en', 'GB'),
         child: MyApp()
     ),
   );
@@ -59,7 +56,7 @@ class _MyAppState extends State<MyApp> {
             scaffoldBackgroundColor: Colors.white,
             fontFamily: 'Google Sans'
           ),
-          home: TabPage()
+          home: Login()
       ),
     );
   }
