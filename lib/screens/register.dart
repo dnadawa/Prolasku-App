@@ -55,7 +55,7 @@ class _RegisterState extends State<Register> {
           'phone': phone.text,
           'phone_full': prefix+phone.text,
           'image': imageEncode,
-          'language': 'en_gb'
+          'language': language.toLowerCase()
         }
       );
       if(response.statusCode==200){
@@ -87,7 +87,7 @@ class _RegisterState extends State<Register> {
     pr = ProgressDialog(context);
     pr = ProgressDialog(context,type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
     pr.style(
-        message: 'Please wait...',
+        message: tr('pleaseWait'),
         borderRadius: 10.0,
         backgroundColor: Colors.white,
         progressWidget: Center(child: CircularProgressIndicator()),
@@ -124,16 +124,16 @@ class _RegisterState extends State<Register> {
             context: context,
             builder: (BuildContext context){
                 return CupertinoAlertDialog(
-                  title: CustomText(text: 'Forgot password',),
-                  content: CustomText(text: 'Would you like to send a new password to ${email.text}?',),
+                  title: CustomText(text: tr('forgotPassword'),),
+                  content: CustomText(text: tr('forgotPasswordConfirmation')+'${email.text}?',),
                   actions: <Widget>[
                     CupertinoDialogAction(
                       isDefaultAction: true,
-                      child: CustomText(text: "Yes"),
+                      child: CustomText(text: tr('yes')),
                       onPressed: ()=>forgotPassword(),
                     ),
                     CupertinoDialogAction(
-                      child: CustomText(text: "No"),
+                      child: CustomText(text: tr('no')),
                       onPressed: (){
                         Navigator.pop(context);
                       },
@@ -178,8 +178,6 @@ class _RegisterState extends State<Register> {
       pr.hide();
       ToastBar(text: tr('somethingWrong'),color: Colors.red).show();
     }
-
-
   }
 
   @override

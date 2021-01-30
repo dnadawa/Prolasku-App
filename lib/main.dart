@@ -10,7 +10,7 @@ Future<void> main() async {
   await DotEnv.load(fileName: '.env');
   runApp(
     EasyLocalization(
-        supportedLocales: [Locale('en', 'GB'), Locale('fi', 'FI')],
+        supportedLocales: [Locale('en', 'GB'), Locale('fi')],
         path: 'assets/translations',
         child: MyApp()
     ),

@@ -63,6 +63,7 @@ flutter:
   assets:
     - assets/translations/
     - assets/images/
+    - assets/images/flags/
     - .env
   #   - images/a_dot_ham.jpeg
 
