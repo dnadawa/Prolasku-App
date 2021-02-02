@@ -68,7 +68,8 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
           itemCount: languages.length,
           itemBuilder: (context,i){
 
-            String name = languages[i]['code'].toString();
+            String code = languages[i]['code'].toString();
+            String name = languages[i]['descrip'];
 
             return Card(
               shape: RoundedRectangleBorder(
@@ -95,7 +96,7 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
                   Expanded(
                     child: RadioListTile(
                       title: CustomText(text: name,isBold: false,),
-                      value: name,
+                      value: code,
                       groupValue: selected,
                       onChanged: (val){
                         setState(() {
