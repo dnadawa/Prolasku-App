@@ -40,6 +40,7 @@ class _HomeState extends State<Home> {
   String location = 'n/a';
   String locationID;
   String language;
+  String name = 'N/A';
 
   getDiscounts() async {
     String url = Constants.apiEndpoint+"get_discounted_items/?username=${env['API_USERNAME']}&password=${env['API_PASSWORD']}&start=0&limit=6";
@@ -85,16 +86,21 @@ class _HomeState extends State<Home> {
     }
   }
   getLocation() async {
-    prefs = await SharedPreferences.getInstance();
     setState(() {
       location = prefs.getString('location');
       locationID = prefs.getString('locationID');
       language = context.locale.toString().toLowerCase();
     });
   }
+  getUserData() async {
+    prefs = await SharedPreferences.getInstance();
+    name = prefs.getString('name');
+    setState(() {});
+  }
 
 
   getData()async{
+    await getUserData();
     await getLatestProducts();
     getDiscounts();
   }
@@ -166,7 +172,7 @@ class _HomeState extends State<Home> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                    CustomText(text: 'Sanjula Hasaranga',font: 'ubuntu',isBold: false,size: ScreenUtil().setSp(40),),
+                    CustomText(text: name,font: 'ubuntu',isBold: false,size: ScreenUtil().setSp(40),),
                     SizedBox(width: ScreenUtil().setWidth(30),),
                     Container(
                         width: ScreenUtil().setWidth(70),

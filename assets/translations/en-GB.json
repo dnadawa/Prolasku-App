@@ -76,6 +76,7 @@
   "somethingWrong": "Something went wrong",
   "imageNotSelected": "Image not selected!",
   "fillAllFields": "Please fill all the fields!",
+  "fillEmail": "Please fill the email!",
   "emailSendingFailed": "Email sending failed!",
   "pleaseWait": "Please wait"
 }

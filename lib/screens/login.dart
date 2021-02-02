@@ -7,6 +7,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:prolasku/screens/register.dart';
+import 'package:prolasku/screens/tab-page.dart';
 import 'package:prolasku/widgets/button.dart';
 import 'package:prolasku/widgets/custom-text.dart';
 import 'package:prolasku/widgets/input-field.dart';
@@ -31,18 +32,6 @@ class _LoginState extends State<Login> {
 
   logIn()async{
     if(email.text!=''&&password.text!=''){
-      pr = ProgressDialog(context);
-      pr = ProgressDialog(context,type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
-      pr.style(
-          message: tr('pleaseWait'),
-          borderRadius: 10.0,
-          backgroundColor: Colors.white,
-          progressWidget: Center(child: CircularProgressIndicator()),
-          elevation: 10.0,
-          insetAnimCurve: Curves.easeInOut,
-          messageTextStyle: TextStyle(
-              color: Colors.black, fontSize: ScreenUtil().setSp(35), fontWeight: FontWeight.bold)
-      );
       pr.show();
       var url = Constants.apiEndpoint+"get_customer/?"
           "username=${env['API_USERNAME']}&"
@@ -63,6 +52,7 @@ class _LoginState extends State<Login> {
         String responseType = body['OUTPUT']['response_type'];
         String message = body['OUTPUT']['message'];
         pr.hide();
+        print(body);
         if(responseType=='success'){
           String email = body['OUTPUT']['email'];
           String cid = body['OUTPUT']['customer_id'];
@@ -71,11 +61,22 @@ class _LoginState extends State<Login> {
 
           Locale locale = Locale.fromSubtags(languageCode: language);
           print(locale);
-          // context.locale = locale;
+          if(locale.toString()=="en_gb"){
+            context.locale = Locale('en', 'GB');
+          }
+          else{
+            context.locale = locale;
+          }
 
           prefs.setString('email',email);
           prefs.setString('cid',cid);
           prefs.setString('name',name);
+
+          Navigator.of(context).pushAndRemoveUntil(
+              CupertinoPageRoute(builder: (context) =>
+                  TabPage()), (Route<dynamic> route) => false);
+
+
         }else{
           ToastBar(text: message, color: Colors.red).show();
         }
@@ -91,6 +92,19 @@ class _LoginState extends State<Login> {
   }
 
   getLanguages()async{
+    prefs = await SharedPreferences.getInstance();
+    pr = ProgressDialog(context);
+    pr = ProgressDialog(context,type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
+    pr.style(
+        message: tr('pleaseWait'),
+        borderRadius: 10.0,
+        backgroundColor: Colors.white,
+        progressWidget: Center(child: CircularProgressIndicator()),
+        elevation: 10.0,
+        insetAnimCurve: Curves.easeInOut,
+        messageTextStyle: TextStyle(
+            color: Colors.black, fontSize: ScreenUtil().setSp(35), fontWeight: FontWeight.bold)
+    );
     var url = Constants.apiEndpoint+"get_languages/?"
         "username=${env['API_USERNAME']}&"
         "password=${env['API_PASSWORD']}";
@@ -114,11 +128,14 @@ class _LoginState extends State<Login> {
                 padding: EdgeInsets.all(ScreenUtil().setWidth(10)),
                 child: GestureDetector(
                   onTap: (){
-                    Locale locale = Locale.fromSubtags(languageCode: languages[i]['code'].toString().toUpperCase());
-                    Locale s = Locale('en', 'GB');
+                    Locale locale = Locale.fromSubtags(languageCode: languages[i]['code'].toString());
                     print(locale);
-                    print(s);
-                    // context.locale = locale;
+                    if(locale.toString()=="en_gb"){
+                      context.locale = Locale('en', 'GB');
+                    }
+                    else{
+                      context.locale = locale;
+                    }
                     },
                   child: Container(
                     child: Image.asset('assets/images/flags/${languages[i]['flag']}'),
@@ -140,6 +157,40 @@ class _LoginState extends State<Login> {
     }
   }
 
+  forgotPassword()async{
+    if(email.text.isNotEmpty){
+      pr.show();
+      var url = Constants.apiEndpoint+"set_customer_password_reset_request/?"
+          "username=${env['API_USERNAME']}&"
+          "password=${env['API_PASSWORD']}&"
+          "email=${email.text}";
+
+      var response = await http.post(
+        url,
+        headers: {
+          'Authorization1': env['API_KEY'],
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+      );
+      print(response.body);
+      if(response.statusCode==200){
+        var body = jsonDecode(response.body);
+        String status = body['OUTPUT']['response_type'];
+        String message = body['OUTPUT']['message'];
+        pr.hide();
+        if(status=='success'){
+          ToastBar(text: message,color: Colors.green).show();
+        }else{
+          ToastBar(text: message,color: Colors.red).show();
+        }
+      }else{
+        pr.hide();
+        ToastBar(text: tr('somethingWrong'),color: Colors.red).show();
+      }
+    }else{
+      ToastBar(text: tr('fillEmail'),color: Colors.red).show();
+    }
+  }
 
   @override
   void initState() {
@@ -191,7 +242,7 @@ class _LoginState extends State<Login> {
                           controller: password,
                           isPassword: true,
                           suffix: GestureDetector(
-                            onTap: (){print('forgot tapped');},
+                            onTap: ()=>forgotPassword(),
                             child: CustomText(
                               text: tr('forgot'),
                               color: Theme.of(context).accentColor,
