@@ -1,14 +1,17 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:prolasku/widgets/button.dart';
 import 'package:prolasku/widgets/custom-text.dart';
 import 'package:prolasku/widgets/input-field.dart';
 import 'package:http/http.dart' as http;
 import 'package:prolasku/widgets/toast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../constants.dart';
 
@@ -44,6 +47,8 @@ class _ProfileState extends State<Profile> {
   String citiesDropDownValue = '';
   String languagesDropDownValue = '';
   String countriesDropDownValue = '';
+  var proPic;
+  String proPicBase64;
 
   ///have some work
   getCities()async{
@@ -64,14 +69,25 @@ class _ProfileState extends State<Profile> {
       setState(() {
         Map cities = body['OUTPUT'];
 
-        for(int i=0;i<10;i++){
-          citiesDropDownItems.add(
-              DropdownMenuItem(
-                child: Center(child: CustomText(text: cities[i.toString()]['city_name'][context.locale.toString().toLowerCase()],font: 'ubuntu',),
-                ),
-                value: cities[i.toString()]['city_id'],
-              )
-          );
+        for(int i=0;i<cities.length-2;i++){
+          if(cities[i.toString()]['city_name'].containsKey(context.locale.toString().toLowerCase())){
+            citiesDropDownItems.add(
+                DropdownMenuItem(
+                  child: Center(child: CustomText(text: cities[i.toString()]['city_name'][context.locale.toString().toLowerCase()],font: 'ubuntu',),
+                  ),
+                  value: cities[i.toString()]['city_id'],
+                )
+            );
+          }
+          else{
+            citiesDropDownItems.add(
+                DropdownMenuItem(
+                  child: Center(child: CustomText(text: cities[i.toString()]['city_name']['fi'],font: 'ubuntu',),
+                  ),
+                  value: cities[i.toString()]['city_id'],
+                )
+            );
+          }
         }
 
         citiesDropDownValue = cities['0']['city_id'];
@@ -103,28 +119,58 @@ class _ProfileState extends State<Profile> {
       setState(() {
         Map countries = body['OUTPUT'];
 
-        for(int i=12;i<47;i++){
-          countriesDropDownItems.add(
+        for(int i=0;i<countries.length-2;i++){
+          if(countries[i.toString()]['country_name'][context.locale.toString().toLowerCase()] is bool){
+            countriesDropDownItems.add(
               DropdownMenuItem(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     SizedBox(width: ScreenUtil().setWidth(20),),
                     Container(
-                      color: Colors.red,
                       height: ScreenUtil().setHeight(37.5),
                       width: ScreenUtil().setWidth(50),
+                      child: Image.asset('icons/flags/png/${countries[i
+                          .toString()]['country_iso_code']
+                          .toString()
+                          .toLowerCase()}.png', package: 'country_icons'),
                     ),
-                    Expanded(child: CustomText(text: countries[i.toString()]['country_name'][context.locale.toString().toLowerCase()],font: 'ubuntu',))
+                    Expanded(child: CustomText(
+                      text: countries[i.toString()]['country_name']['fi'], font: 'ubuntu',))
                   ],
                 ),
                 value: countries[i.toString()]['country_id'],
               ),
-          );
-          print(countries[i.toString()]['country_id']);
+            );
+          }
+          else {
+            countriesDropDownItems.add(
+              DropdownMenuItem(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    SizedBox(width: ScreenUtil().setWidth(20),),
+                    Container(
+                      height: ScreenUtil().setHeight(37.5),
+                      width: ScreenUtil().setWidth(50),
+                      child: Image.asset('icons/flags/png/${countries[i
+                          .toString()]['country_iso_code']
+                          .toString()
+                          .toLowerCase()}.png', package: 'country_icons'),
+                    ),
+                    Expanded(child: CustomText(
+                      text: countries[i.toString()]['country_name'][context
+                          .locale.toString().toLowerCase()], font: 'ubuntu',))
+                  ],
+                ),
+                value: countries[i.toString()]['country_id'],
+              ),
+            );
+          }
+          // print(countries[i.toString()]['country_id']);
         }
 
-        countriesDropDownValue = countries['13']['country_id'];
+        countriesDropDownValue = countries['0']['country_id'];
 
       });
       // print(body);
@@ -162,7 +208,7 @@ class _ProfileState extends State<Profile> {
                     Container(
                       height: ScreenUtil().setHeight(37.5),
                       width: ScreenUtil().setWidth(50),
-                      child: Image.asset('assets/images/flags/${languages[i]['flag']}'),
+                      child: Image.asset('icons/flags/png/${languages[i]['flag']!='zh.png'?languages[i]['flag']:'cn.png'}', package: 'country_icons'),
                     ),
                     Expanded(child: CustomText(text: languages[i]['descrip'],font: 'ubuntu',))
                   ],
@@ -182,36 +228,63 @@ class _ProfileState extends State<Profile> {
     }
   }
 
-  // getCustomer()async{
-  //   var url = Constants.apiEndpoint+"get_customer/?"
-  //         "username=${env['API_USERNAME']}&"
-  //         "password=${env['API_PASSWORD']}&"
-  //         "email=${email.text}&"
-  //         "customer_password=${password.text}";
-  //
-  //     var response = await http.post(
-  //       url,
-  //       headers: {
-  //         'Authorization1': env['API_KEY'],
-  //         'Content-Type': 'application/x-www-form-urlencoded'
-  //       },
-  //     );
-  //
-  //     if(response.statusCode==200){
-  //       var body = jsonDecode(response.body);
-  //       Map customer = body['OUTPUT'];
-  //       String email = body['OUTPUT']['email'];
-  //       String cid = body['OUTPUT']['customer_id'];
-  //       String name = body['OUTPUT']['firstname'];
-  //       String language = body['OUTPUT']['language'];
-  //
-  //     }
-  //     else{
-  //       ToastBar(text: tr('somethingWrong'),color: Colors.red).show();
-  //     }
-  //
-  //
-  // }
+  getCustomer()async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String password = prefs.getString('password');
+    String emailAddress = prefs.getString('email');
+
+    var url = Constants.apiEndpoint+"get_customer/?"
+          "username=${env['API_USERNAME']}&"
+          "password=${env['API_PASSWORD']}&"
+          "email=$emailAddress&"
+          "customer_password=$password";
+
+      var response = await http.post(
+        url,
+        headers: {
+          'Authorization1': env['API_KEY'],
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+      );
+
+      if(response.statusCode==200){
+        var body = jsonDecode(response.body);
+       setState(() {
+         Map customer = body['OUTPUT'];
+         fullName.text = customer['firstname'];
+         email.text = customer['email'];
+         phone.text = customer['phone'];
+         businessID.text = customer['business_id'] is bool?'':customer['business_id'];
+         ad1.text = customer['address'] is bool?'':customer['address'];
+         ad2.text = customer['address2'] is bool?'':customer['address2'];
+         postal.text = customer['postal'] is bool?'':customer['postal'];
+         state.text = customer['state'] is bool?'':customer['state'];
+         state.text = customer['state'] is bool?'':customer['state'];
+
+         ///shipping details
+         shipping = customer['different_shipping_address']==0?'no':'yes';
+         sAd1.text = customer['shipping_address'] is bool?'':customer['shipping_address'];
+         sPostal.text = customer['shipping_postal'] is bool?'':customer['shipping_postal'];
+         sState.text = customer['shipping_state'] is bool?'':customer['shipping_state'];
+         orderingEmail.text = customer['ordering_email'] is bool?'':customer['ordering_email'];
+         billingEmail.text = customer['billing_email'] is bool?'':customer['billing_email'];
+         website.text = customer['website'] is bool?'':customer['website'];
+
+         languagesDropDownValue = customer['language'];
+         citiesDropDownValue = customer['city_id'];
+         countriesDropDownValue = customer['country_id'];
+         newsletter = customer['newsletter']==0?false:true;
+         proPicBase64 = customer['image'][0];
+         proPic = base64Decode(proPicBase64);
+       });
+
+      }
+      else{
+        ToastBar(text: tr('somethingWrong'),color: Colors.red).show();
+      }
+
+
+  }
 
   @override
   void initState() {
@@ -220,6 +293,7 @@ class _ProfileState extends State<Profile> {
     getCities();
     getLanguages();
     getCountries();
+    getCustomer();
   }
 
   @override
@@ -259,10 +333,26 @@ class _ProfileState extends State<Profile> {
                         ///profilePicture
                         CustomText(text: tr('uploadProfilePicture'),isBold: false,size: ScreenUtil().setSp(35),),
                         SizedBox(height: ScreenUtil().setHeight(30),),
-                        CircleAvatar(
-                          backgroundColor: Theme.of(context).accentColor,
-                          radius: 40,
-                          child: Icon(Icons.person,color: Colors.white,size: 50,),
+                        GestureDetector(
+                          onTap: ()async{
+                            final pickedFile = await ImagePicker().getImage(source: ImageSource.gallery);
+                            setState(() {
+                              if (pickedFile != null) {
+                                File image = File(pickedFile.path);
+                                proPic = image.readAsBytesSync();
+                                proPicBase64 = base64Encode(proPic);
+                                print(proPicBase64);
+                              } else {
+                                ToastBar(text: tr('imageNotSelected'),color: Colors.red).show();
+                              }
+                            });
+                          },
+                          child: CircleAvatar(
+                            backgroundColor: Theme.of(context).accentColor,
+                            radius: 40,
+                            child: proPic==null?Icon(Icons.person,color: Colors.white,size: 50,):null,
+                            backgroundImage: proPic!=null?MemoryImage(proPic):null,
+                          ),
                         ),
 
                         ///name
@@ -277,8 +367,6 @@ class _ProfileState extends State<Profile> {
                         ///phone
                         InputField(
                           hint: tr('phoneNo'),
-                          //TODO: Add Prefix of phone no
-                          prefix: Container(),
                           controller: phone,
                         ),
                         SizedBox(height: ScreenUtil().setHeight(30),),
@@ -306,8 +394,11 @@ class _ProfileState extends State<Profile> {
                                 setState(() {
                                   languagesDropDownValue = val;
                                   Locale locale = Locale.fromSubtags(languageCode: languagesDropDownValue);
-                                  if(locale.toString()=="en_gb"){
-                                    context.locale = Locale('en', 'GB');
+                                  String lStr = locale.toString();
+                                  if(lStr.length==5){
+                                      String language = lStr.substring(0,2);
+                                      String country = lStr.substring(3,5);
+                                      context.locale = Locale(language, country.toUpperCase());
                                   }
                                   else{
                                     context.locale = locale;

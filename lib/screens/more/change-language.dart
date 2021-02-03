@@ -102,9 +102,11 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
                         setState(() {
                           selected = val;
                           Locale locale = Locale.fromSubtags(languageCode: selected);
-                          print(locale);
-                          if(locale.toString()=="en_gb"){
-                            context.locale = Locale('en', 'GB');
+                          String lStr = locale.toString();
+                          if(lStr.length==5){
+                            String language = lStr.substring(0,2);
+                            String country = lStr.substring(3,5);
+                            context.locale = Locale(language, country.toUpperCase());
                           }
                           else{
                             context.locale = locale;

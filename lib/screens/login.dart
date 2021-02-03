@@ -60,9 +60,11 @@ class _LoginState extends State<Login> {
           String language = body['OUTPUT']['language'];
 
           Locale locale = Locale.fromSubtags(languageCode: language);
-          print(locale);
-          if(locale.toString()=="en_gb"){
-            context.locale = Locale('en', 'GB');
+          String lStr = locale.toString();
+          if(lStr.length==5){
+            String language = lStr.substring(0,2);
+            String country = lStr.substring(3,5);
+            context.locale = Locale(language, country.toUpperCase());
           }
           else{
             context.locale = locale;
@@ -71,6 +73,7 @@ class _LoginState extends State<Login> {
           prefs.setString('email',email);
           prefs.setString('cid',cid);
           prefs.setString('name',name);
+          prefs.setString('password', password.text);
 
           Navigator.of(context).pushAndRemoveUntil(
               CupertinoPageRoute(builder: (context) =>
@@ -128,19 +131,21 @@ class _LoginState extends State<Login> {
                 padding: EdgeInsets.all(ScreenUtil().setWidth(10)),
                 child: GestureDetector(
                   onTap: (){
-                    Locale locale = Locale.fromSubtags(languageCode: languages[i]['code'].toString());
-                    print(locale);
-                    if(locale.toString()=="en_gb"){
-                      context.locale = Locale('en', 'GB');
+                    Locale locale = Locale.fromSubtags(languageCode: languages[i]['code']);
+                    String lStr = locale.toString();
+                    if(lStr.length==5){
+                      String language = lStr.substring(0,2);
+                      String country = lStr.substring(3,5);
+                      context.locale = Locale(language, country.toUpperCase());
                     }
                     else{
                       context.locale = locale;
                     }
                     },
                   child: Container(
-                    child: Image.asset('assets/images/flags/${languages[i]['flag']}'),
-                    height: ScreenUtil().setHeight(60),
-                    width: ScreenUtil().setWidth(80),
+                    child: Image.asset('icons/flags/png/${languages[i]['flag']!='zh.png'?languages[i]['flag']:'cn.png'}', package: 'country_icons'),
+                    height: ScreenUtil().setHeight(30),
+                    width: ScreenUtil().setWidth(40),
                   ),
                 ),
               )
