@@ -71,7 +71,10 @@ class _ProductsState extends State<Products> {
               elevation: 5,
               shape: CircleBorder(),
               child: GestureDetector(
-                onTap: ()=>ScaffoldState().openEndDrawer(),
+                onTap: (){
+                  print('clicked');
+                  Scaffold.of(context).openEndDrawer();
+                },
                 child: CircleAvatar(
                   radius: 18,
                   backgroundColor: Colors.white,
@@ -95,10 +98,10 @@ class _ProductsState extends State<Products> {
                 bottom: TabBar(
                   isScrollable: true,
                   tabs: [
-                    Tab(text: 'Price',),
-                    Tab(text: 'Categories',),
-                    Tab(text: 'Brands',),
-                    Tab(text: 'Stock',),
+                    Tab(text: tr('price'),),
+                    Tab(text: tr('categories'),),
+                    Tab(text: tr('brands'),),
+                    Tab(text: tr('stock'),),
                   ],
                 ),
               ),

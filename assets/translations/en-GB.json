@@ -78,5 +78,7 @@
   "fillAllFields": "Please fill all the fields!",
   "fillEmail": "Please fill the email!",
   "emailSendingFailed": "Email sending failed!",
-  "pleaseWait": "Please wait"
+  "profileUpdateFail": "Profile update failed!",
+  "pleaseWait": "Please wait",
+  "filter": "Filter"
 }

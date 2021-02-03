@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 import 'package:prolasku/widgets/button.dart';
 import 'package:prolasku/widgets/custom-text.dart';
 import 'package:prolasku/widgets/input-field.dart';
@@ -45,12 +48,13 @@ class _ProfileState extends State<Profile> {
   List<DropdownMenuItem> languagesDropDownItems = [];
   List<DropdownMenuItem> countriesDropDownItems = [];
   String citiesDropDownValue = '';
+  String shippingCitiesDropDownValue = '';
   String languagesDropDownValue = '';
   String countriesDropDownValue = '';
   var proPic;
   String proPicBase64;
+  String prefix;
 
-  ///have some work
   getCities()async{
     var url = Constants.apiEndpoint+"get_cities/?"
         "username=${env['API_USERNAME']}&"
@@ -67,30 +71,31 @@ class _ProfileState extends State<Profile> {
     if(response.statusCode==200){
       var body = jsonDecode(response.body);
       setState(() {
-        Map cities = body['OUTPUT'];
+        List cities = body['OUTPUT'];
 
-        for(int i=0;i<cities.length-2;i++){
-          if(cities[i.toString()]['city_name'].containsKey(context.locale.toString().toLowerCase())){
+        for(int i=0;i<cities.length;i++){
+          if(cities[i]['city_name'].containsKey(context.locale.toString().toLowerCase())){
             citiesDropDownItems.add(
                 DropdownMenuItem(
-                  child: Center(child: CustomText(text: cities[i.toString()]['city_name'][context.locale.toString().toLowerCase()],font: 'ubuntu',),
+                  child: Center(child: CustomText(text: cities[i]['city_name'][context.locale.toString().toLowerCase()],font: 'ubuntu',),
                   ),
-                  value: cities[i.toString()]['city_id'],
+                  value: cities[i]['city_id'],
                 )
             );
           }
           else{
             citiesDropDownItems.add(
                 DropdownMenuItem(
-                  child: Center(child: CustomText(text: cities[i.toString()]['city_name']['fi'],font: 'ubuntu',),
+                  child: Center(child: CustomText(text: cities[i]['city_name']['fi'],font: 'ubuntu',),
                   ),
-                  value: cities[i.toString()]['city_id'],
+                  value: cities[i]['city_id'],
                 )
             );
           }
         }
 
-        citiesDropDownValue = cities['0']['city_id'];
+        citiesDropDownValue = cities[0]['city_id'];
+        shippingCitiesDropDownValue = cities[0]['city_id'];
 
       });
       // print(body);
@@ -100,7 +105,6 @@ class _ProfileState extends State<Profile> {
     }
   }
 
-  ///have some work
   getCountries()async{
     var url = Constants.apiEndpoint+"get_countries/?"
         "username=${env['API_USERNAME']}&"
@@ -117,10 +121,10 @@ class _ProfileState extends State<Profile> {
     if(response.statusCode==200){
       var body = jsonDecode(response.body);
       setState(() {
-        Map countries = body['OUTPUT'];
+        List countries = body['OUTPUT'];
 
-        for(int i=0;i<countries.length-2;i++){
-          if(countries[i.toString()]['country_name'][context.locale.toString().toLowerCase()] is bool){
+        for(int i=0;i<countries.length;i++){
+          if(countries[i]['country_name'][context.locale.toString().toLowerCase()] is bool){
             countriesDropDownItems.add(
               DropdownMenuItem(
                 child: Row(
@@ -130,16 +134,15 @@ class _ProfileState extends State<Profile> {
                     Container(
                       height: ScreenUtil().setHeight(37.5),
                       width: ScreenUtil().setWidth(50),
-                      child: Image.asset('icons/flags/png/${countries[i
-                          .toString()]['country_iso_code']
+                      child: Image.asset('icons/flags/png/${countries[i]['country_iso_code']
                           .toString()
                           .toLowerCase()}.png', package: 'country_icons'),
                     ),
                     Expanded(child: CustomText(
-                      text: countries[i.toString()]['country_name']['fi'], font: 'ubuntu',))
+                      text: countries[i]['country_name']['fi'], font: 'ubuntu',))
                   ],
                 ),
-                value: countries[i.toString()]['country_id'],
+                value: countries[i]['country_id'],
               ),
             );
           }
@@ -153,24 +156,23 @@ class _ProfileState extends State<Profile> {
                     Container(
                       height: ScreenUtil().setHeight(37.5),
                       width: ScreenUtil().setWidth(50),
-                      child: Image.asset('icons/flags/png/${countries[i
-                          .toString()]['country_iso_code']
+                      child: Image.asset('icons/flags/png/${countries[i]['country_iso_code']
                           .toString()
                           .toLowerCase()}.png', package: 'country_icons'),
                     ),
                     Expanded(child: CustomText(
-                      text: countries[i.toString()]['country_name'][context
+                      text: countries[i]['country_name'][context
                           .locale.toString().toLowerCase()], font: 'ubuntu',))
                   ],
                 ),
-                value: countries[i.toString()]['country_id'],
+                value: countries[i]['country_id'],
               ),
             );
           }
           // print(countries[i.toString()]['country_id']);
         }
 
-        countriesDropDownValue = countries['0']['country_id'];
+        countriesDropDownValue = countries[0]['country_id'];
 
       });
       // print(body);
@@ -259,7 +261,6 @@ class _ProfileState extends State<Profile> {
          ad2.text = customer['address2'] is bool?'':customer['address2'];
          postal.text = customer['postal'] is bool?'':customer['postal'];
          state.text = customer['state'] is bool?'':customer['state'];
-         state.text = customer['state'] is bool?'':customer['state'];
 
          ///shipping details
          shipping = customer['different_shipping_address']==0?'no':'yes';
@@ -272,10 +273,12 @@ class _ProfileState extends State<Profile> {
 
          languagesDropDownValue = customer['language'];
          citiesDropDownValue = customer['city_id'];
+         shippingCitiesDropDownValue = customer['shipping_city_id'];
          countriesDropDownValue = customer['country_id'];
          newsletter = customer['newsletter']==0?false:true;
          proPicBase64 = customer['image'][0];
          proPic = base64Decode(proPicBase64);
+         prefix = customer['phone_prefix'];
        });
 
       }
@@ -284,6 +287,109 @@ class _ProfileState extends State<Profile> {
       }
 
 
+  }
+
+  updateProfile()async{
+    ProgressDialog pr;
+    pr = ProgressDialog(context);
+    pr = ProgressDialog(context,type: ProgressDialogType.Normal, isDismissible: true, showLogs: false);
+    pr.style(
+        message: tr('pleaseWait'),
+        borderRadius: 10.0,
+        backgroundColor: Colors.white,
+        progressWidget: Center(child: CircularProgressIndicator()),
+        elevation: 10.0,
+        insetAnimCurve: Curves.easeInOut,
+        messageTextStyle: TextStyle(
+            color: Colors.black, fontSize: ScreenUtil().setSp(35), fontWeight: FontWeight.bold)
+    );
+    pr.show();
+    var url = Constants.apiEndpoint+"set_customer_update_profile/?"
+        "username=${env['API_USERNAME']}&"
+        "password=${env['API_PASSWORD']}&"
+        "email=${email.text}";
+
+    Map<String, dynamic> reqBody;
+    if(shipping=='yes'){
+      reqBody = {
+        'image': [proPicBase64],
+        'firstname': fullName.text,
+        'phone_prefix': prefix,
+        'phone': phone.text,
+        'phone_full': prefix+phone.text,
+        'language': languagesDropDownValue,
+        //tradename
+        //business
+        'business_id': businessID.text,
+        'address': ad1.text,
+        'address2': ad2.text,
+        'postal': postal.text,
+        'state': state.text,
+        'city_id': citiesDropDownValue,
+        'country_id': countriesDropDownValue,
+        'different_shipping_address': shipping=='yes'?1:0,
+        'shipping_address': sAd1.text,
+        'shipping_city_id': shippingCitiesDropDownValue,
+        'shipping_postal': sPostal.text,
+        'shipping_state': sState.text,
+        'ordering_email': orderingEmail.text,
+        'billing_email': billingEmail.text,
+        'website': website.text,
+        'newsletter': newsletter?1:0,
+      };
+    }
+    else{
+      reqBody = {
+        'image': proPicBase64,
+        'firstname': fullName.text,
+        'phone_prefix': prefix,
+        'phone': phone.text,
+        'phone_full': prefix+phone.text,
+        'language': languagesDropDownValue,
+        //tradename
+        //business
+        'business_id': businessID.text,
+        'address': ad1.text,
+        'address2': ad2.text,
+        'postal': postal.text,
+        'state': state.text,
+        'city_id': citiesDropDownValue,
+        'country_id': countriesDropDownValue,
+        'different_shipping_address': shipping=='yes'?'1':'0',
+        'ordering_email': orderingEmail.text,
+        'billing_email': billingEmail.text,
+        'website': website.text,
+        'newsletter': newsletter?'1':'0',
+      };
+    }
+
+
+    var response = await http.post(
+        url,
+        headers: {
+          'Authorization1': env['API_KEY'],
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: reqBody
+    );
+    if(response.statusCode==200){
+      var body = jsonDecode(response.body);
+      String responseType = body['OUTPUT']['response_type'];
+      String message = body['OUTPUT']['message'];
+      pr.hide();
+      if(responseType=='success'){
+        ToastBar(text: message,color: Colors.green).show();
+        Navigator.pop(context);
+      }else{
+        ToastBar(text: message,color: Colors.red).show();
+      }
+
+    }
+    else{
+      print('error'+response.statusCode.toString());
+      pr.hide();
+      ToastBar(text: tr('profileUpdateFail'),color: Colors.red).show();
+    }
   }
 
   @override
@@ -365,9 +471,45 @@ class _ProfileState extends State<Profile> {
 
 
                         ///phone
-                        InputField(
-                          hint: tr('phoneNo'),
-                          controller: phone,
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: Container(
+                                height: ScreenUtil().setHeight(60),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(color: Colors.black,width: 2)
+                                ),
+                                child: CountryCodePicker(
+                                  showDropDownButton: false,
+                                  showFlagDialog: true,
+                                  showFlag: false,
+                                  showFlagMain: false,
+                                  initialSelection: prefix,
+                                  textStyle: GoogleFonts.ubuntu(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: ScreenUtil().setSp(30)
+                                  ),
+                                  onInit: (code){},
+                                  onChanged: (code){
+                                      prefix = code.toString();
+                                      print(prefix);
+                                  },
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: ScreenUtil().setWidth(20),),
+                            Expanded(
+                              flex: 4,
+                              child: InputField(
+                                hint: tr('phoneNo'),
+                                controller: phone,
+                                type: TextInputType.phone,
+                              ),
+                            ),
+                          ],
                         ),
                         SizedBox(height: ScreenUtil().setHeight(30),),
 
@@ -543,12 +685,6 @@ class _ProfileState extends State<Profile> {
                         if(shipping=='yes')
                         SizedBox(height: ScreenUtil().setHeight(30),),
 
-                        ///shippingAddressLine2
-                        if(shipping=='yes')
-                        InputField(hint: tr('shippingAddressLine2'),controller: sAd2,),
-                        if(shipping=='yes')
-                        SizedBox(height: ScreenUtil().setHeight(30),),
-
 
                         ///shippingCityID
                         if(shipping=='yes')
@@ -558,26 +694,27 @@ class _ProfileState extends State<Profile> {
                         if(shipping=='yes')
                         SizedBox(height: ScreenUtil().setHeight(25),),
                         if(shipping=='yes')
-                        Container(
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5),
-                              color: Colors.white,
-                              border: Border.all(color: Colors.black,width: 2)
-                          ),
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setHeight(10)),
-                            child: DropdownButton(
-                              isExpanded: true,
-                              underline: Container(),
-                              items: [
-                                DropdownMenuItem(
-                                  child: Center(child: CustomText(text: 'Helsinki',font: 'ubuntu',)),
-                                )
-                              ],
-                              onChanged: (val){},
+                          citiesDropDownItems.isNotEmpty?Container(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
+                                color: Colors.white,
+                                border: Border.all(color: Colors.black,width: 2)
                             ),
-                          ),
-                        ),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setHeight(10)),
+                              child: DropdownButton(
+                                isExpanded: true,
+                                underline: Container(),
+                                value: shippingCitiesDropDownValue,
+                                items: citiesDropDownItems,
+                                onChanged: (val){
+                                  setState(() {
+                                    shippingCitiesDropDownValue = val;
+                                  });
+                                },
+                              ),
+                            ),
+                          ):LinearProgressIndicator(backgroundColor: Colors.white,),
                         if(shipping=='yes')
                         SizedBox(height: ScreenUtil().setHeight(30),),
 
@@ -628,7 +765,7 @@ class _ProfileState extends State<Profile> {
                         SizedBox(
                             width: double.infinity,
                             height: ScreenUtil().setHeight(100),
-                            child: Button(text: tr('update'),onPressed: (){}))
+                            child: Button(text: tr('update'),onPressed: ()=>updateProfile()))
                       ],
                     ),
                   ),
