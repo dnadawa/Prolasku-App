@@ -80,5 +80,10 @@
   "emailSendingFailed": "Email sending failed!",
   "profileUpdateFail": "Profile update failed!",
   "pleaseWait": "Please wait",
-  "filter": "Filter"
+  "filter": "Filter",
+  "price": "Price",
+  "categories": "Categories",
+  "brands": "Brands",
+  "stock": "Stock",
+  "applyFilters": "Apply Filters"
 }

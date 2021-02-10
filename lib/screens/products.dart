@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:easy_localization/easy_localization.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:prolasku/constants.dart';
+import 'package:prolasku/screens/drawer/drawer.dart';
 import 'package:prolasku/screens/products/products-grid-view.dart';
 import 'package:prolasku/screens/products/products-list-view.dart';
 import 'package:prolasku/widgets/custom-text.dart';
@@ -14,6 +16,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class Products extends StatefulWidget {
   static ScrollController scrollController = ScrollController();
+  // ignore: close_sinks
+  static StreamController streamController = StreamController.broadcast();
   @override
   _ProductsState createState() => _ProductsState();
 }
@@ -23,10 +27,11 @@ class _ProductsState extends State<Products> {
   bool isListView = true;
   List products;
   int start = 0;
+  String filter = '';
   getProducts(int start) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String locationID = prefs.getString('locationID');
-    String url = Constants.apiEndpoint+"get_products/?username=${env['API_USERNAME']}&password=${env['API_PASSWORD']}&start=$start&limit=5&location_id=$locationID";
+    String url = Constants.apiEndpoint+"get_products/?username=${env['API_USERNAME']}&password=${env['API_PASSWORD']}&start=${start*50}&limit=50&location_id=$locationID"+filter;
     print(url);
     var response = await http.post(
       url,
@@ -55,19 +60,29 @@ class _ProductsState extends State<Products> {
   }
 
 
+
 @override
   void initState() {
     // TODO: implement initState
     super.initState();
     getProducts(0);
+
+    Stream stream = Products.streamController.stream;
+    stream.asBroadcastStream().listen((value) {
+      filter = value;
+      products = null;
+      getProducts(start);
+    });
+
     Products.scrollController.addListener(() {
       if(Products.scrollController.position.pixels == Products.scrollController.position.maxScrollExtent){
         print('max scrolled');
         start++;
-        getProducts(start);
+        getProducts(0);
       }
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -139,48 +154,7 @@ class _ProductsState extends State<Products> {
       ),
 
       endDrawer: Drawer(
-          child: DefaultTabController(
-            length: 4,
-            child: Scaffold(
-              appBar: AppBar(
-                title: CustomText(text: tr('filter'),font: 'ubuntu',),
-                elevation: 0,
-                centerTitle: true,
-                automaticallyImplyLeading: false,
-                bottom: TabBar(
-                  isScrollable: true,
-                  tabs: [
-                    Tab(text: tr('price'),),
-                    Tab(text: tr('categories'),),
-                    Tab(text: tr('brands'),),
-                    Tab(text: tr('stock'),),
-                  ],
-                ),
-              ),
-
-              body: Padding(
-                padding:  EdgeInsets.all(ScreenUtil().setHeight(20)),
-                child: ListView(
-                  children: [
-                    Row(
-                      children: [
-                        Checkbox(value: true, onChanged: (val){},),
-                        CustomText(text: 'Rice Bags',align: TextAlign.start,),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Checkbox(value: true, onChanged: (val){},),
-                        CustomText(text: 'Rice Bags',align: TextAlign.start,),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-
-
-            ),
-          ),
+          child: Filter(),
       ),
 
 
