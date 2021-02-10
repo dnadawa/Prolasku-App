@@ -13,6 +13,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Products extends StatefulWidget {
+  static ScrollController scrollController = ScrollController();
   @override
   _ProductsState createState() => _ProductsState();
 }
@@ -21,11 +22,11 @@ class _ProductsState extends State<Products> {
 
   bool isListView = true;
   List products;
-
-  getProducts() async {
+  int start = 0;
+  getProducts(int start) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String locationID = prefs.getString('locationID');
-    String url = Constants.apiEndpoint+"get_products/?username=${env['API_USERNAME']}&password=${env['API_PASSWORD']}&start=0&limit=50&location_id=$locationID";
+    String url = Constants.apiEndpoint+"get_products/?username=${env['API_USERNAME']}&password=${env['API_PASSWORD']}&start=$start&limit=5&location_id=$locationID";
     print(url);
     var response = await http.post(
       url,
@@ -37,7 +38,14 @@ class _ProductsState extends State<Products> {
     if(response.statusCode==200){
       var body = jsonDecode(response.body);
       setState(() {
-        products = body['OUTPUT'];
+        if(products==null){
+          products = body['OUTPUT'];
+        }else{
+          products = products + body['OUTPUT'];
+        }
+
+        print(products);
+
       });
     }
     else{
@@ -51,7 +59,14 @@ class _ProductsState extends State<Products> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    getProducts();
+    getProducts(0);
+    Products.scrollController.addListener(() {
+      if(Products.scrollController.position.pixels == Products.scrollController.position.maxScrollExtent){
+        print('max scrolled');
+        start++;
+        getProducts(start);
+      }
+    });
   }
   @override
   Widget build(BuildContext context) {

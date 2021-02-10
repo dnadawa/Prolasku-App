@@ -9,6 +9,9 @@ import 'package:prolasku/screens/products/product-details.dart';
 import 'package:prolasku/widgets/button.dart';
 import 'package:prolasku/widgets/custom-text.dart';
 import 'package:prolasku/widgets/marquee.dart';
+import 'package:flutter/cupertino.dart';
+
+import '../products.dart';
 
 class ProductsListView extends StatefulWidget {
   final List products;
@@ -25,8 +28,12 @@ class _ProductsListViewState extends State<ProductsListView> {
     return Padding(
       padding: EdgeInsets.all(ScreenUtil().setHeight(20)),
       child: widget.products!=null?ListView.builder(
-        itemCount: widget.products.length,
+        itemCount: widget.products.length+1,
+        controller: Products.scrollController,
         itemBuilder: (context,i){
+          if(i == widget.products.length){
+            return CupertinoActivityIndicator();
+          }
           String image;
           String description;
           List images;
@@ -55,6 +62,7 @@ class _ProductsListViewState extends State<ProductsListView> {
           Currency euro = Currency.create('EUR', 2, symbol: '€', invertSeparators: true, pattern: '0,00S');
           Money price = Money.from(widget.products[i]['price'], euro);
           Money disPrice = Money.from(widget.products[i]['price_buy'], euro);
+
 
 
           return Padding(

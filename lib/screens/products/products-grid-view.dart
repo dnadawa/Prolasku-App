@@ -10,6 +10,8 @@ import 'package:prolasku/widgets/button.dart';
 import 'package:prolasku/widgets/custom-text.dart';
 import 'package:prolasku/widgets/marquee.dart';
 
+import '../products.dart';
+
 class ProductsGridView extends StatefulWidget {
   final List products;
 
@@ -31,8 +33,12 @@ class _ProductsGridViewState extends State<ProductsGridView> {
           mainAxisSpacing: ScreenUtil().setWidth(25),
           childAspectRatio: 0.57
         ),
-        itemCount: widget.products.length,
+        itemCount: widget.products.length+1,
+        controller: Products.scrollController,
         itemBuilder: (context,i){
+          if(i == widget.products.length){
+            return CupertinoActivityIndicator();
+          }
           String image;
           String description;
           List images;
