@@ -20,11 +20,12 @@ class ProductDetails extends StatefulWidget {
   final List images;
   final List stockData;
   final String price;
+  final String disPrice;
   final String vat;
   final String description;
   final int stockAlert;
 
-  const ProductDetails({Key key, this.productID, this.name, this.discount, this.images, this.price, this.vat, this.description, this.stockData, this.stockAlert}) : super(key: key);
+  const ProductDetails({Key key, this.productID, this.name, this.discount, this.images, this.price, this.vat, this.description, this.stockData, this.stockAlert, this.disPrice}) : super(key: key);
   @override
   _ProductDetailsState createState() => _ProductDetailsState();
 }
@@ -130,7 +131,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                   CustomText(text: widget.price,font: 'josefin',size: ScreenUtil().setSp(60),color: Colors.red,),
                   SizedBox(width: ScreenUtil().setWidth(8),),
                   if(widget.discount!=0)
-                  Text('90,00\$',style: GoogleFonts.josefinSans(
+                  Text(widget.disPrice,style: GoogleFonts.josefinSans(
                       fontSize: ScreenUtil().setSp(35),
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
@@ -189,8 +190,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                     stock <= widget.stockAlert && stock > 0
                                         ? Colors.orange
                                         :
-                                    Colors.transparent
-                                    ,
+                                    Colors.transparent,
                                     radius: 5,
                                   ),
                                   SizedBox(width: ScreenUtil().setWidth(20),),
@@ -210,7 +210,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                           ),
                         );
                       }else{
-                        return Center(child: CircularProgressIndicator(),);
+                        return Center(child: LinearProgressIndicator(backgroundColor: Colors.white,),);
                       }
                     },
                   );

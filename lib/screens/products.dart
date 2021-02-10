@@ -1,10 +1,16 @@
+import 'dart:convert';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:prolasku/constants.dart';
 import 'package:prolasku/screens/products/products-grid-view.dart';
 import 'package:prolasku/screens/products/products-list-view.dart';
 import 'package:prolasku/widgets/custom-text.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Products extends StatefulWidget {
   @override
@@ -14,8 +20,39 @@ class Products extends StatefulWidget {
 class _ProductsState extends State<Products> {
 
   bool isListView = true;
+  List products;
+
+  getProducts() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String locationID = prefs.getString('locationID');
+    String url = Constants.apiEndpoint+"get_products/?username=${env['API_USERNAME']}&password=${env['API_PASSWORD']}&start=0&limit=50&location_id=$locationID";
+    print(url);
+    var response = await http.post(
+      url,
+      headers: {
+        'Authorization1': env['API_KEY'],
+        'Content-Type': 'application/json'
+      },
+    );
+    if(response.statusCode==200){
+      var body = jsonDecode(response.body);
+      setState(() {
+        products = body['OUTPUT'];
+      });
+    }
+    else{
+      print('error'+response.statusCode.toString());
+      print(response.body);
+    }
+  }
 
 
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getProducts();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -132,7 +169,7 @@ class _ProductsState extends State<Products> {
       ),
 
 
-      body: isListView?ProductsListView():ProductsGridView(),
+      body: isListView?ProductsListView(products: products,):ProductsGridView(products: products,),
     );
   }
 }

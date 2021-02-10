@@ -276,7 +276,7 @@ class _ProfileState extends State<Profile> {
          shippingCitiesDropDownValue = customer['shipping_city_id'];
          countriesDropDownValue = customer['country_id'];
          newsletter = customer['newsletter']==0?false:true;
-         proPicBase64 = customer['image'][0];
+         proPicBase64 = customer['image'];
          proPic = base64Decode(proPicBase64);
          prefix = customer['phone_prefix'];
        });
@@ -312,7 +312,7 @@ class _ProfileState extends State<Profile> {
     Map<String, dynamic> reqBody;
     if(shipping=='yes'){
       reqBody = {
-        'image': [proPicBase64],
+        'image': proPicBase64,
         'firstname': fullName.text,
         'phone_prefix': prefix,
         'phone': phone.text,

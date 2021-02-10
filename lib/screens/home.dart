@@ -284,6 +284,7 @@ class _HomeState extends State<Home> {
 
                           Currency euro = Currency.create('EUR', 2, symbol: '€', invertSeparators: true, pattern: '0,00S');
                           Money price = Money.from(latestProducts[i]['price'], euro);
+                          Money disPrice = Money.from(latestProducts[i]['price_buy'], euro);
 
                           return GestureDetector(
                             onTap: (){
@@ -299,6 +300,7 @@ class _HomeState extends State<Home> {
                                     description: description,
                                     stockData: stockData,
                                     stockAlert: stockAlert,
+                                    disPrice: disPrice.toString(),
                                   ))
                               );
                             },
