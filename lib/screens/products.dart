@@ -28,6 +28,7 @@ class _ProductsState extends State<Products> {
   List products;
   int start = 0;
   String filter = '';
+  int totalItemCount = 0;
   getProducts(int start) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String locationID = prefs.getString('locationID');
@@ -49,6 +50,7 @@ class _ProductsState extends State<Products> {
           products = products + body['OUTPUT'];
         }
 
+        totalItemCount = body['INFO']['total_count'];
         print(products);
 
       });
@@ -160,7 +162,7 @@ class _ProductsState extends State<Products> {
       ),
 
 
-      body: isListView?ProductsListView(products: products,):ProductsGridView(products: products,),
+      body: isListView?ProductsListView(products: products,totalItemCount: totalItemCount,):ProductsGridView(products: products,totalItemCount: totalItemCount,),
     );
   }
 }

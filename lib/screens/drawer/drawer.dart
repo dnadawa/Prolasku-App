@@ -9,6 +9,8 @@ import 'package:prolasku/widgets/button.dart';
 import 'package:prolasku/widgets/custom-text.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'brands.dart';
+
 class Filter extends StatefulWidget {
   @override
   _FilterState createState() => _FilterState();
@@ -45,7 +47,7 @@ class _FilterState extends State<Filter> {
                   children: [
                     Price(),
                     Categories(),
-                    Categories(),
+                    Brands(),
                     Categories(),
                   ],
                 ),
@@ -65,9 +67,16 @@ class _FilterState extends State<Filter> {
 
 
                   ///categories
-                  List<String> selected = prefs.getStringList('categories')??[];
-                  for(int i=0;i<selected.length;i++){
-                    filter += "&cid[$i]=${selected[i]}";
+                  List<String> selectedCategories = prefs.getStringList('categories')??[];
+                  for(int i=0;i<selectedCategories.length;i++){
+                    filter += "&cid[$i]=${selectedCategories[i]}";
+                  }
+
+
+                  ///brands
+                  List<String> selectedBrands = prefs.getStringList('brands')??[];
+                  for(int i=0;i<selectedBrands.length;i++){
+                    filter += "&bid[$i]=${selectedBrands[i]}";
                   }
 
                   print(filter);

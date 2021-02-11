@@ -15,8 +15,9 @@ import '../products.dart';
 
 class ProductsListView extends StatefulWidget {
   final List products;
+  final int totalItemCount;
 
-  const ProductsListView({Key key, this.products}) : super(key: key);
+  const ProductsListView({Key key, this.products, this.totalItemCount}) : super(key: key);
   @override
   _ProductsListViewState createState() => _ProductsListViewState();
 }
@@ -31,8 +32,13 @@ class _ProductsListViewState extends State<ProductsListView> {
         itemCount: widget.products.length+1,
         controller: Products.scrollController,
         itemBuilder: (context,i){
-          if(i == widget.products.length){
-            return CupertinoActivityIndicator();
+          if(i==widget.products.length){
+            if(i!=widget.totalItemCount) {
+              return CupertinoActivityIndicator();
+            }
+            else{
+              return Container();
+            }
           }
           String image;
           String description;
