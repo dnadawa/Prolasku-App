@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/screenutil.dart';
+import 'package:prolasku/constants.dart';
 import 'package:prolasku/screens/drawer/categories.dart';
 import 'package:prolasku/screens/drawer/price.dart';
 import 'package:prolasku/screens/products.dart';
@@ -58,9 +59,19 @@ class _FilterState extends State<Filter> {
                   SharedPreferences prefs = await SharedPreferences.getInstance();
 
                   ///price
-                  double min = prefs.getDouble('minPrice');
-                  double max = prefs.getDouble('maxPrice');
+                  double min = prefs.getDouble('minPrice')??Constants.minPrice;
+                  double max = prefs.getDouble('maxPrice')??Constants.maxPrice;
                   filter += "&min_price=$min&max_price=$max";
+
+
+                  ///categories
+                  List<String> selected = prefs.getStringList('categories')??[];
+                  for(int i=0;i<selected.length;i++){
+                    filter += "&cid[$i]=${selected[i]}";
+                  }
+
+                  print(filter);
+
                   Products.streamController.add(filter);
                   Navigator.pop(context);
                   },

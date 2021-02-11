@@ -70,7 +70,9 @@ class _ProductsState extends State<Products> {
     Stream stream = Products.streamController.stream;
     stream.asBroadcastStream().listen((value) {
       filter = value;
-      products = null;
+      setState(() {
+        products = null;
+      });
       getProducts(start);
     });
 
