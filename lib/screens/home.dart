@@ -455,19 +455,52 @@ class _HomeState extends State<Home> {
                           // height: ScreenUtil().setHeight(400)
                         ),
                         itemBuilder: (context,i){
+
                           String image;
+                          String description;
+                          List images;
                           if(discountedItems[i]['images'].length>0){
                             image = discountedItems[i]['images'][0]['URL'];
+                            images = discountedItems[i]['images'];
                           }
                           else{
-                            image = 'https://www.orientalheritageagra.com/wp-content/uploads/2019/03/product-png-image-59158.png';
+                            image = '';
+                            images = [];
                           }
+
+                          String name = discountedItems[i]['product_name'][language] is bool?discountedItems[i]['product_name']['fi']:discountedItems[i]['product_name'][language];
+                          try{
+                            description = discountedItems[i]['product_desc'][language];
+                          }catch(e){
+                            description = "";
+                          }
+                          String id = discountedItems[i]['pid'];
+                          int discount = discountedItems[i]['discount'].round();
+                          String vat = discountedItems[i]['vat'];
+                          List stockData = discountedItems[i]['stock_data'];
+                          // int stock = stockData[0]['stock'];
+                          int stockAlert = int.parse(discountedItems[i]['stock_alert_qty'].toString());
+
+                          Currency euro = Currency.create('EUR', 2, symbol: '€', invertSeparators: true, pattern: '0,00S');
+                          Money price = Money.from(discountedItems[i]['price'], euro);
+                          Money disPrice = Money.from(discountedItems[i]['price_buy'], euro);
 
                           return GestureDetector(
                             onTap: (){
                               Navigator.push(
                                   context,
-                                  CupertinoPageRoute(builder: (context) => ProductDetails())
+                                  CupertinoPageRoute(builder: (context) => ProductDetails(
+                                    productID: id,
+                                    name: name,
+                                    discount: discount,
+                                    images: images,
+                                    price: price.toString(),
+                                    vat: vat,
+                                    description: description,
+                                    stockData: stockData,
+                                    stockAlert: stockAlert,
+                                    disPrice: disPrice.toString(),
+                                  ))
                               );
                             },
                             child: SizedBox(
@@ -486,7 +519,11 @@ class _HomeState extends State<Home> {
                                           children: [
                                             Padding(
                                               padding: EdgeInsets.all(ScreenUtil().setWidth(15)),
-                                              child: Center(child: Image.network(image)),
+                                              child: Center(child:CachedNetworkImage(
+                                                imageUrl: image,
+                                                placeholder: (context,x)=>Icon(Icons.no_photography,size: 50,),
+                                                errorWidget: (context,x,error)=>Icon(Icons.no_photography,size: 50,),
+                                              )),
                                             ),
                                             Padding(
                                               padding: EdgeInsets.fromLTRB(0,0,ScreenUtil().setWidth(10),ScreenUtil().setWidth(20)),
@@ -505,7 +542,7 @@ class _HomeState extends State<Home> {
                                                               child: Column(
                                                                 mainAxisAlignment: MainAxisAlignment.center,
                                                                 children: [
-                                                                  CustomText(text: '99%',size: ScreenUtil().setSp(38),font: 'josefin',color: Colors.white,),
+                                                                  CustomText(text: '$discount%',size: ScreenUtil().setSp(38),font: 'josefin',color: Colors.white,),
                                                                   CustomText(text: tr('discount'),size: ScreenUtil().setSp(20),font: 'josefin',color: Colors.white,),
                                                                 ],
                                                               ),
@@ -518,12 +555,15 @@ class _HomeState extends State<Home> {
                                           ],
                                         )
                                     ),
-                                    CustomText(text: 'name',font: 'josefin',),
+                                    Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setHeight(15)),
+                                      child: MarqueeWidget(child: CustomText(text: name,font: 'josefin',)),
+                                    ),
                                     Padding(
                                       padding: EdgeInsets.all(ScreenUtil().setWidth(15)),
                                       child: RichText(
                                         text: TextSpan(
-                                            text: '\$150.00 ',
+                                            text: price.toString(),
                                             style: GoogleFonts.josefinSans(
                                                 color: Colors.red,
                                                 fontWeight: FontWeight.bold,
@@ -531,7 +571,7 @@ class _HomeState extends State<Home> {
                                             ),
                                             children: [
                                               TextSpan(
-                                                  text: '\$250.00',
+                                                  text: disPrice.toString(),
                                                   style: GoogleFonts.josefinSans(
                                                       color: Colors.black,
                                                       fontWeight: FontWeight.bold,

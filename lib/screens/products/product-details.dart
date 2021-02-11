@@ -239,7 +239,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                     Padding(
                       padding: EdgeInsets.all(ScreenUtil().setWidth(30)),
                       child: CustomText(
-                        text: widget.description,
+                        text: widget.description??'',
                         isBold: false,
                         size: ScreenUtil().setSp(28),
                         align: TextAlign.start,
