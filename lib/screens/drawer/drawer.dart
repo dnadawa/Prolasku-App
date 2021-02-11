@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/screenutil.dart';
 import 'package:prolasku/constants.dart';
 import 'package:prolasku/screens/drawer/categories.dart';
 import 'package:prolasku/screens/drawer/price.dart';
+import 'package:prolasku/screens/drawer/stock.dart';
 import 'package:prolasku/screens/products.dart';
 import 'package:prolasku/widgets/button.dart';
 import 'package:prolasku/widgets/custom-text.dart';
@@ -48,7 +49,7 @@ class _FilterState extends State<Filter> {
                     Price(),
                     Categories(),
                     Brands(),
-                    Categories(),
+                    Stock(),
                   ],
                 ),
               ),
@@ -79,6 +80,13 @@ class _FilterState extends State<Filter> {
                     filter += "&bid[$i]=${selectedBrands[i]}";
                   }
 
+                  ///stocks
+                  bool inStock = prefs.getBool('inStock')??false;
+                  if(inStock){
+                    filter += '&show_only_instock_items=1';
+                  }else{
+                    filter += '&show_only_instock_items=0';
+                  }
                   print(filter);
 
                   Products.streamController.add(filter);

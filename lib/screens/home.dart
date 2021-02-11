@@ -439,7 +439,14 @@ class _HomeState extends State<Home> {
                         ),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(25)),
-                          child: CustomText(text: tr('seeMore'),isBold: false,color: Theme.of(context).accentColor,),
+                          child: GestureDetector(
+                              onTap: (){
+                                Navigator.push(
+                                    context,
+                                    CupertinoPageRoute(builder: (context) => Products())
+                                );
+                              },
+                              child: CustomText(text: tr('seeMore'),isBold: false,color: Theme.of(context).accentColor,)),
                         )
                       ],
                     ),

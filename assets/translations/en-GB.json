@@ -85,5 +85,6 @@
   "categories": "Categories",
   "brands": "Brands",
   "stock": "Stock",
-  "applyFilters": "Apply Filters"
+  "applyFilters": "Apply Filters",
+  "inStockItems": "In Stocks items only"
 }
