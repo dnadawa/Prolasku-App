@@ -61,8 +61,6 @@ class _ProductsState extends State<Products> {
     }
   }
 
-
-
 @override
   void initState() {
     // TODO: implement initState
@@ -89,7 +87,9 @@ class _ProductsState extends State<Products> {
 
   @override
   Widget build(BuildContext context) {
+    final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: CustomText(text: tr('products'),font: 'ubuntu',),
         elevation: 0,
@@ -144,7 +144,7 @@ class _ProductsState extends State<Products> {
               child: GestureDetector(
                 onTap: (){
                   print('clicked');
-                  Scaffold.of(context).openEndDrawer();
+                  _scaffoldKey.currentState.openEndDrawer();
                 },
                 child: CircleAvatar(
                   radius: 18,
