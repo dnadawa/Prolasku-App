@@ -94,8 +94,8 @@ class _ProfileState extends State<Profile> {
           }
         }
 
-        citiesDropDownValue = cities[0]['city_id'];
-        shippingCitiesDropDownValue = cities[0]['city_id'];
+        // citiesDropDownValue = cities[0]['city_id'];
+        // shippingCitiesDropDownValue = cities[0]['city_id'];
 
       });
       // print(body);
@@ -172,7 +172,7 @@ class _ProfileState extends State<Profile> {
           // print(countries[i.toString()]['country_id']);
         }
 
-        countriesDropDownValue = countries[0]['country_id'];
+        // countriesDropDownValue = countries[0]['country_id'];
 
       });
       // print(body);
@@ -273,12 +273,12 @@ class _ProfileState extends State<Profile> {
 
          languagesDropDownValue = customer['language'];
          citiesDropDownValue = customer['city_id'];
-         shippingCitiesDropDownValue = customer['shipping_city_id'];
+         shippingCitiesDropDownValue = customer['shipping_city_id'].toString();
          countriesDropDownValue = customer['country_id'];
          newsletter = customer['newsletter']==0?false:true;
+         prefix = customer['phone_prefix'];
          proPicBase64 = customer['image'];
          proPic = base64Decode(proPicBase64);
-         prefix = customer['phone_prefix'];
        });
 
       }
@@ -290,6 +290,7 @@ class _ProfileState extends State<Profile> {
   }
 
   updateProfile()async{
+    print('diff shipping'+ shipping=='yes'?'1':'0');
     ProgressDialog pr;
     pr = ProgressDialog(context);
     pr = ProgressDialog(context,type: ProgressDialogType.Normal, isDismissible: true, showLogs: false);
@@ -327,7 +328,7 @@ class _ProfileState extends State<Profile> {
         'state': state.text,
         'city_id': citiesDropDownValue,
         'country_id': countriesDropDownValue,
-        'different_shipping_address': shipping=='yes'?1:0,
+        'different_shipping_address': shipping=='yes'?'1':'0',
         'shipping_address': sAd1.text,
         'shipping_city_id': shippingCitiesDropDownValue,
         'shipping_postal': sPostal.text,
@@ -335,7 +336,7 @@ class _ProfileState extends State<Profile> {
         'ordering_email': orderingEmail.text,
         'billing_email': billingEmail.text,
         'website': website.text,
-        'newsletter': newsletter?1:0,
+        'newsletter': newsletter?'1':'0',
       };
     }
     else{
@@ -492,7 +493,7 @@ class _ProfileState extends State<Profile> {
                                       fontWeight: FontWeight.bold,
                                       fontSize: ScreenUtil().setSp(30)
                                   ),
-                                  onInit: (code){},
+                                  onInit: (code){prefix = code.toString();},
                                   onChanged: (code){
                                       prefix = code.toString();
                                       print(prefix);
