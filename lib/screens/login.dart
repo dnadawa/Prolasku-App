@@ -58,6 +58,7 @@ class _LoginState extends State<Login> {
           String cid = body['OUTPUT']['customer_id'];
           String name = body['OUTPUT']['firstname'];
           String language = body['OUTPUT']['language'];
+          String cr = body['OUTPUT']['crcustomer_id'] is bool?'false':body['OUTPUT']['crcustomer_id'];
 
           Locale locale = Locale.fromSubtags(languageCode: language);
           String lStr = locale.toString();
@@ -74,6 +75,7 @@ class _LoginState extends State<Login> {
           prefs.setString('cid',cid);
           prefs.setString('name',name);
           prefs.setString('password', password.text);
+          prefs.setString('cr', cr);
 
           Navigator.of(context).pushAndRemoveUntil(
               CupertinoPageRoute(builder: (context) =>

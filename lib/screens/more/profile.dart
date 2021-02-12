@@ -377,6 +377,8 @@ class _ProfileState extends State<Profile> {
       var body = jsonDecode(response.body);
       String responseType = body['OUTPUT']['response_type'];
       String message = body['OUTPUT']['message'];
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString('name', fullName.text);
       pr.hide();
       if(responseType=='success'){
         ToastBar(text: message,color: Colors.green).show();

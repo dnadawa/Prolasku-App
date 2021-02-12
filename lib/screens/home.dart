@@ -10,6 +10,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:money2/money2.dart';
 import 'package:prolasku/main.dart';
+import 'package:prolasku/screens/loyalty-card.dart';
 import 'package:prolasku/screens/more/newsletter.dart';
 import 'package:prolasku/screens/products.dart';
 import 'package:prolasku/screens/products/product-details.dart';
@@ -150,7 +151,12 @@ class _HomeState extends State<Home> {
 
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: (){},
+        onPressed: (){
+          Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => LoyaltyCard())
+          );
+        },
         label: CustomText(text: tr('loyaltyCard'),color: Colors.white,size: ScreenUtil().setSp(35),),
       ),
 
