@@ -55,7 +55,8 @@ class _RegisterState extends State<Register> {
           'phone': phone.text,
           'phone_full': prefix+phone.text,
           'image': imageEncode,
-          'language': language.toLowerCase()
+          // 'language': language.toLowerCase()
+          'language': 'en_gb'
         }
       );
       if(response.statusCode==200){

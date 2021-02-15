@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -94,8 +95,8 @@ class _ProfileState extends State<Profile> {
           }
         }
 
-        // citiesDropDownValue = cities[0]['city_id'];
-        // shippingCitiesDropDownValue = cities[0]['city_id'];
+        citiesDropDownValue = cities[0]['city_id'];
+        shippingCitiesDropDownValue = cities[0]['city_id'];
 
       });
       // print(body);
@@ -172,7 +173,7 @@ class _ProfileState extends State<Profile> {
           // print(countries[i.toString()]['country_id']);
         }
 
-        // countriesDropDownValue = countries[0]['country_id'];
+        countriesDropDownValue = countries[0]['country_id'];
 
       });
       // print(body);
@@ -251,19 +252,23 @@ class _ProfileState extends State<Profile> {
 
       if(response.statusCode==200){
         var body = jsonDecode(response.body);
+        Map customer = body['OUTPUT'];
        setState(() {
-         Map customer = body['OUTPUT'];
+         countriesDropDownValue = customer['country_id'];
+
          fullName.text = customer['firstname'];
          email.text = customer['email'];
          phone.text = customer['phone'];
          businessID.text = customer['business_id'] is bool?'':customer['business_id'];
+         business.text = customer['company'] is bool?'':customer['company'];
+         tradeName.text = customer['lastname'] is bool?'':customer['lastname'];
          ad1.text = customer['address'] is bool?'':customer['address'];
          ad2.text = customer['address2'] is bool?'':customer['address2'];
          postal.text = customer['postal'] is bool?'':customer['postal'];
          state.text = customer['state'] is bool?'':customer['state'];
 
          ///shipping details
-         shipping = customer['different_shipping_address']==0?'no':'yes';
+         shipping = customer['different_shipping_address'].toString()=="0"?'no':'yes';
          sAd1.text = customer['shipping_address'] is bool?'':customer['shipping_address'];
          sPostal.text = customer['shipping_postal'] is bool?'':customer['shipping_postal'];
          sState.text = customer['shipping_state'] is bool?'':customer['shipping_state'];
@@ -274,8 +279,7 @@ class _ProfileState extends State<Profile> {
          languagesDropDownValue = customer['language'];
          citiesDropDownValue = customer['city_id'];
          shippingCitiesDropDownValue = customer['shipping_city_id'].toString();
-         countriesDropDownValue = customer['country_id'];
-         newsletter = customer['newsletter']==0?false:true;
+         newsletter = customer['newsletter'].toString()=='0'?false:true;
          prefix = customer['phone_prefix'];
          proPicBase64 = customer['image'];
          proPic = base64Decode(proPicBase64);
@@ -290,7 +294,6 @@ class _ProfileState extends State<Profile> {
   }
 
   updateProfile()async{
-    print('diff shipping'+ shipping=='yes'?'1':'0');
     ProgressDialog pr;
     pr = ProgressDialog(context);
     pr = ProgressDialog(context,type: ProgressDialogType.Normal, isDismissible: true, showLogs: false);
@@ -311,6 +314,7 @@ class _ProfileState extends State<Profile> {
         "email=${email.text}";
 
     Map<String, dynamic> reqBody;
+    print(proPicBase64);
     if(shipping=='yes'){
       reqBody = {
         'image': proPicBase64,
@@ -319,8 +323,8 @@ class _ProfileState extends State<Profile> {
         'phone': phone.text,
         'phone_full': prefix+phone.text,
         'language': languagesDropDownValue,
-        //tradename
-        //business
+        'lastname': tradeName.text,
+        'company': business.text,
         'business_id': businessID.text,
         'address': ad1.text,
         'address2': ad2.text,
@@ -347,8 +351,8 @@ class _ProfileState extends State<Profile> {
         'phone': phone.text,
         'phone_full': prefix+phone.text,
         'language': languagesDropDownValue,
-        //tradename
-        //business
+        'lastname': tradeName.text,
+        'company': business.text,
         'business_id': businessID.text,
         'address': ad1.text,
         'address2': ad2.text,
@@ -395,14 +399,19 @@ class _ProfileState extends State<Profile> {
     }
   }
 
+
+  getData()async{
+    await getCountries();
+    getCities();
+    getLanguages();
+    getCustomer();
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    getCities();
-    getLanguages();
-    getCountries();
-    getCustomer();
+    getData();
   }
 
   @override
